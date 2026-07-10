@@ -80,8 +80,8 @@
 
     /* Strokes — solid 1px partout (P1), warm-neutral en light/dark */
     --fd-stroke: 1px;
-    --fd-border-soft-light: oklch(0.918 0.005 75);
-    --fd-border-soft-dark:  oklch(0.300 0.005 75);
+    --fd-border-soft-light: oklch(0.884 0.030 71);
+    --fd-border-soft-dark:  oklch(0.320 0.012 65);
 
     /* Elevation — subtle / heavy (per visual direction §Ombres) */
     --fd-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
@@ -402,59 +402,33 @@ body {
 }
 
 .fi-sidebar-item:not(.fi-active) .fi-sidebar-item-btn:hover {
-    background-color: color-mix(in oklch, var(--fi-color-primary-500) 8%, transparent);
-    color: var(--fi-color-primary-700);
+    background-color: color-mix(in oklch, var(--fi-color-primary-500) 7%, transparent);
+    color: var(--fi-color-gray-900);
 }
 .dark .fi-sidebar-item:not(.fi-active) .fi-sidebar-item-btn:hover {
-    color: var(--fi-color-primary-300);
+    background-color: color-mix(in oklch, var(--fi-color-primary-500) 12%, transparent);
+    color: var(--fi-color-gray-50);
 }
 
+/* Active — a soft honey wash with dark ink and a thin edge bar, echoing the
+   restrained active-nav treatment on filamentphp.com (weight + colour shift,
+   not a heavy gradient). */
 .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
-    background: linear-gradient(
-        90deg,
-        color-mix(in oklch, var(--fi-color-primary-500) 14%, transparent),
-        color-mix(in oklch, var(--fi-color-primary-500) 4%, transparent) 70%,
-        transparent 100%
-    );
-    color: var(--fi-color-primary-700);
+    background-color: color-mix(in oklch, var(--fi-color-primary-400) 20%, transparent);
+    color: var(--fi-color-gray-900);
     font-weight: 600;
-    box-shadow:
-        inset 3px 0 0 0 var(--fi-color-primary-500),
-        inset 0 0 0 1px color-mix(in oklch, var(--fi-color-primary-500) 12%, transparent);
+    box-shadow: inset 2px 0 0 0 var(--fi-color-primary-500);
 }
 .dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
-    color: var(--fi-color-primary-300);
-    background: linear-gradient(
-        90deg,
-        color-mix(in oklch, var(--fi-color-primary-500) 22%, transparent),
-        color-mix(in oklch, var(--fi-color-primary-500) 8%, transparent) 70%,
-        transparent 100%
-    );
+    color: var(--fi-color-gray-50);
+    background-color: color-mix(in oklch, var(--fi-color-primary-400) 24%, transparent);
 }
 .fi-sidebar-item.fi-active .fi-sidebar-item-icon {
     color: var(--fi-color-primary-500);
 }
 
-/* Active indicator dot at the right edge — quiet "you are here" marker.
-   Hidden when the item already carries a count badge (we'd collide with it);
-   the badge below picks up the active treatment instead. */
 .fi-sidebar-item .fi-sidebar-item-btn {
     position: relative;
-}
-.fi-sidebar-item.fi-active .fi-sidebar-item-btn::after {
-    content: '';
-    position: absolute;
-    inset-inline-end: 0.625rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0.3125rem;
-    height: 0.3125rem;
-    border-radius: 9999px;
-    background-color: var(--fi-color-primary-500);
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--fi-color-primary-500) 18%, transparent);
-}
-.fi-sidebar-item.fi-active:has(.fi-sidebar-item-badge-ctn) .fi-sidebar-item-btn::after {
-    display: none;
 }
 
 /* When the sidebar is collapsed to icons, the active "bubble" (gradient,
@@ -523,17 +497,15 @@ body {
 
 .fi-section {
     background-color: white;
-    border: var(--fd-stroke) solid var(--fi-color-gray-200);
+    border: var(--fd-stroke) solid var(--fd-border-soft-light);
     border-radius: var(--fd-radius);
-    box-shadow:
-        0 0 0 var(--fd-frame-gap) var(--fd-frame-gap-color),
-        0 0 0 calc(var(--fd-frame-gap) + 1px) var(--fd-frame-ring-color);
+    box-shadow: none;
     --tw-ring-shadow: 0 0 #0000;
     --tw-shadow: 0 0 #0000;
 }
 .dark .fi-section {
     background-color: var(--fi-color-gray-900);
-    border-color: var(--fi-color-gray-800);
+    border-color: var(--fd-border-soft-dark);
 }
 
 /* Nested sections (Section → Section, Repeater items, etc.) — opt the
@@ -556,7 +528,7 @@ body {
 */
 .fi-section-header {
     padding: 1.25rem 1.5rem 1.125rem;
-    border-bottom: var(--fd-stroke) solid var(--fi-color-gray-200);
+    border-bottom: var(--fd-stroke) solid var(--fd-border-soft-light);
 }
 .dark .fi-section-header {
     border-bottom-color: var(--fi-color-gray-800);
@@ -616,11 +588,11 @@ body {
 
 .fi-header-heading {
     font-family: var(--font-display);
-    font-size: 2.25rem;
-    font-weight: 800;
-    letter-spacing: -0.045em;
-    color: var(--fi-color-gray-900);
-    line-height: 1.05;
+    font-size: 2.125rem;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    color: oklch(0.28 0.035 52);
+    line-height: 1.1;
     text-wrap: balance;
     position: relative;
     display: inline-block;
