@@ -270,23 +270,14 @@ body {
 | force everything back to white.
 */
 .fi-body {
-    background:
-        radial-gradient(
-            ellipse 90% 40% at 15% -10%,
-            color-mix(in oklch, var(--fi-color-primary-500) 6%, transparent),
-            transparent 55%
-        ),
-        radial-gradient(
-            ellipse 70% 35% at 95% 8%,
-            color-mix(in oklch, var(--fi-color-primary-500) 4%, transparent),
-            transparent 60%
-        ),
-        radial-gradient(
-            ellipse 80% 50% at 80% 95%,
-            color-mix(in oklch, var(--fi-color-primary-500) 3%, transparent),
-            transparent 65%
-        ),
-        var(--fd-canvas);
+    background-color: var(--fd-canvas);
+    background-image:
+        radial-gradient(color-mix(in oklch, var(--fi-color-gray-500) 22%, transparent) 1px, transparent 1.6px),
+        radial-gradient(ellipse 90% 40% at 15% -10%, color-mix(in oklch, var(--fi-color-primary-500) 7%, transparent), transparent 55%),
+        radial-gradient(ellipse 70% 35% at 95% 8%, color-mix(in oklch, var(--fi-color-primary-500) 4%, transparent), transparent 60%),
+        radial-gradient(ellipse 80% 50% at 80% 95%, color-mix(in oklch, var(--fi-color-primary-500) 3%, transparent), transparent 65%);
+    background-size: 22px 22px, 100% 100%, 100% 100%, 100% 100%;
+    background-repeat: repeat, no-repeat, no-repeat, no-repeat;
     background-attachment: fixed;
     min-height: 100vh;
 }
@@ -294,23 +285,14 @@ body {
     --fd-canvas: var(--fi-color-gray-950);
 }
 .dark .fi-body {
-    background:
-        radial-gradient(
-            ellipse 90% 40% at 15% -10%,
-            color-mix(in oklch, var(--fi-color-primary-500) 12%, transparent),
-            transparent 55%
-        ),
-        radial-gradient(
-            ellipse 70% 35% at 95% 8%,
-            color-mix(in oklch, var(--fi-color-primary-500) 8%, transparent),
-            transparent 60%
-        ),
-        radial-gradient(
-            ellipse 80% 50% at 80% 95%,
-            color-mix(in oklch, var(--fi-color-primary-500) 6%, transparent),
-            transparent 65%
-        ),
-        var(--fd-canvas);
+    background-color: var(--fd-canvas);
+    background-image:
+        radial-gradient(color-mix(in oklch, var(--fi-color-gray-300) 9%, transparent) 1px, transparent 1.6px),
+        radial-gradient(ellipse 90% 40% at 15% -10%, color-mix(in oklch, var(--fi-color-primary-500) 12%, transparent), transparent 55%),
+        radial-gradient(ellipse 70% 35% at 95% 8%, color-mix(in oklch, var(--fi-color-primary-500) 8%, transparent), transparent 60%),
+        radial-gradient(ellipse 80% 50% at 80% 95%, color-mix(in oklch, var(--fi-color-primary-500) 6%, transparent), transparent 65%);
+    background-size: 22px 22px, 100% 100%, 100% 100%, 100% 100%;
+    background-repeat: repeat, no-repeat, no-repeat, no-repeat;
     background-attachment: fixed;
 }
 
@@ -322,7 +304,7 @@ body {
 .fi-main-ctn { padding-block: 2rem; }
 
 .fi-topbar {
-    background-color: white;
+    background-color: var(--fd-canvas);
     border-bottom: 1px solid var(--fd-border-soft-light);
     box-shadow: none;
     --tw-ring-shadow: 0 0 #0000;
@@ -349,7 +331,7 @@ body {
 */
 
 .fi-sidebar {
-    background-color: white;
+    background-color: var(--fd-canvas);
     border-right: 1px solid var(--fd-border-soft-light);
 }
 .dark .fi-sidebar {
@@ -360,7 +342,7 @@ body {
 .fi-sidebar-header {
     padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--fd-border-soft-light);
-    background-color: white;
+    background-color: var(--fd-canvas);
 }
 .dark .fi-sidebar-header {
     background-color: var(--fi-color-gray-900);
@@ -634,9 +616,9 @@ body {
 
 .fi-header-heading {
     font-family: var(--font-display);
-    font-size: 1.875rem;
-    font-weight: 700;
-    letter-spacing: -0.04em;
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.045em;
     color: var(--fi-color-gray-900);
     line-height: 1.05;
     text-wrap: balance;
@@ -647,9 +629,8 @@ body {
     color: var(--fi-color-gray-50);
 }
 
-/* Subtle primary-colored period after the title — laravel.com signature
-   accent. Targets only the page-level header (h1), not section/widget
-   headings (which use h3). */
+/* Honey period after the title — a nod to filamentphp.com's playful accents.
+   Targets only the page-level header (h1), not section/widget headings. */
 h1.fi-header-heading::after {
     content: '.';
     color: var(--fi-color-primary-500);
