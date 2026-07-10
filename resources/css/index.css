@@ -410,18 +410,21 @@ body {
     color: var(--fi-color-gray-50);
 }
 
-/* Active — a soft honey wash with dark ink and a thin edge bar, echoing the
-   restrained active-nav treatment on filamentphp.com (weight + colour shift,
-   not a heavy gradient). */
+/* Active — corner brackets like the site's active navbar item (⌐ ¬), dark
+   bold ink, a whisper of honey wash for sidebar legibility. Tighter corner
+   inset since menu rows are short. */
 .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
-    background-color: color-mix(in oklch, var(--fi-color-primary-400) 20%, transparent);
+    background-color: color-mix(in oklch, var(--fi-color-primary-400) 9%, transparent);
+    background-image: var(--fd-corners);
+    background-position: 5px 5px, calc(100% - 5px) 5px, 5px calc(100% - 5px), calc(100% - 5px) calc(100% - 5px);
+    background-repeat: no-repeat;
     color: var(--fi-color-gray-900);
     font-weight: 600;
-    box-shadow: inset 2px 0 0 0 var(--fi-color-primary-500);
+    box-shadow: none;
 }
 .dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
     color: var(--fi-color-gray-50);
-    background-color: color-mix(in oklch, var(--fi-color-primary-400) 24%, transparent);
+    background-color: color-mix(in oklch, var(--fi-color-primary-400) 12%, transparent);
 }
 .fi-sidebar-item.fi-active .fi-sidebar-item-icon {
     color: var(--fi-color-primary-500);
@@ -719,14 +722,14 @@ h1.fi-header-heading::after {
 }
 
 .fi-btn.fi-outlined {
-    background-color: white;
-    border: 1px solid var(--fi-color-gray-300);
+    background-color: var(--fd-surface);
+    border: 1px solid var(--fd-border-soft-light);
     color: var(--fi-color-gray-800);
     box-shadow: none;
 }
 .fi-btn.fi-outlined:hover {
-    background-color: var(--fi-color-gray-50);
-    border-color: var(--fi-color-gray-400);
+    background-color: color-mix(in oklch, var(--fi-color-primary-400) 12%, var(--fd-surface));
+    border-color: color-mix(in oklch, var(--fi-color-primary-500) 30%, var(--fd-border-soft-light));
     color: var(--fi-color-gray-900);
 }
 .dark .fi-btn.fi-outlined {
@@ -1366,14 +1369,14 @@ h1.fi-header-heading::after {
    ========================================================================== */
 
 .fi-badge {
-    border-radius: var(--fd-pill);
-    font-weight: 700;
+    border-radius: 2px;
+    font-weight: 500;
     font-size: 0.6875rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding-inline: 0.625rem;
-    padding-block: 0.1875rem;
-    border: 1px solid color-mix(in oklch, currentColor 20%, transparent);
+    letter-spacing: 0;
+    text-transform: none;
+    padding-inline: 0.375rem;
+    padding-block: 0.125rem;
+    border: none;
 }
 
 /* ==========================================================================
