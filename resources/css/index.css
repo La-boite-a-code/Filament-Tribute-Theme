@@ -1292,7 +1292,7 @@ h1.fi-header-heading::after {
     letter-spacing: 0;
     color: var(--fi-color-gray-600);
     padding-block: 0.75rem;
-    border-bottom: 1px solid var(--fi-color-gray-200);
+    border-bottom: 1px solid var(--fd-border-soft-light);
 }
 .dark .fi-ta-header-cell,
 .dark .fi-ta-table > thead > tr > .fi-ta-selection-cell,
@@ -1312,7 +1312,14 @@ h1.fi-header-heading::after {
     transition: background-color 100ms ease;
     border-top: 1px solid var(--fd-border-soft-light);
 }
-.dark .fi-ta-row {
+/* Beat Filament's default divide-gray-200 so row hairlines read warm-tan. */
+.fi-ta-table tbody .fi-ta-row,
+.fi-ta-table > tbody > tr {
+    border-top-color: var(--fd-border-soft-light);
+}
+.dark .fi-ta-row,
+.dark .fi-ta-table tbody .fi-ta-row,
+.dark .fi-ta-table > tbody > tr {
     border-top-color: var(--fd-border-soft-dark);
 }
 
@@ -1441,6 +1448,9 @@ h1.fi-header-heading::after {
     border-radius: 0;
     padding: 0;
     display: flex;
+    width: 100%;
+    justify-content: flex-start;
+    margin-inline: 0;
     gap: 0.25rem;
     border: none;
     border-bottom: 1px solid var(--fd-border-soft-light);
