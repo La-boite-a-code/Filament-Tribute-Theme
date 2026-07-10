@@ -1008,11 +1008,9 @@ h1.fi-header-heading::after {
    palette-tinted outer ring with a canvas-coloured gap. */
 .fi-ta {
     background-color: white;
-    border: 1px solid var(--fi-color-gray-200);
+    border: 1px solid var(--fd-border-soft-light);
     border-radius: var(--fd-radius);
-    box-shadow:
-        0 0 0 var(--fd-frame-gap) var(--fd-frame-gap-color),
-        0 0 0 calc(var(--fd-frame-gap) + 1px) var(--fd-frame-ring-color);
+    box-shadow: none;
     --tw-ring-shadow: 0 0 #0000;
     --tw-shadow: 0 0 #0000;
     overflow: hidden;
@@ -1020,7 +1018,7 @@ h1.fi-header-heading::after {
 }
 .dark .fi-ta {
     background-color: var(--fi-color-gray-900);
-    border-color: var(--fi-color-gray-800);
+    border-color: var(--fd-border-soft-dark);
 }
 
 /* Header (search bar, column manager, etc.) sits above the table.
@@ -1166,7 +1164,7 @@ h1.fi-header-heading::after {
 */
 .fi-ta-content-footer,
 .fi-pagination {
-    margin-top: calc(var(--fd-frame-gap) + 1px + 0.875rem);
+    margin-top: calc(4px + 0.875rem);
     background-color: transparent;
     border: 0;
     border-radius: 0;
@@ -1212,14 +1210,17 @@ h1.fi-header-heading::after {
 | dividers between <li> items and a shared white pill background. We keep
 | that group look, only flipping the active item to the primary honey.
 */
+.fi-pagination-item-btn {
+    border-radius: 2px;
+    box-shadow: none;
+}
 .fi-pagination-item.fi-active .fi-pagination-item-btn {
-    background-color: var(--fi-color-primary-400);
+    background-color: var(--fd-border-soft-light);
     background-image: none;
-    box-shadow:
-        0 1px 2px 0 color-mix(in oklch, var(--fi-color-primary-700) 18%, transparent);
+    box-shadow: none;
 }
 .fi-pagination-item.fi-active .fi-pagination-item-label {
-    color: var(--fi-color-primary-950);
+    color: oklch(0.28 0.02 45);
 }
 
 /* Search input — minimal, sits on the canvas */
@@ -1417,19 +1418,15 @@ h1.fi-header-heading::after {
 .dark .fi-tabs-item:hover { color: var(--fi-color-gray-100); }
 
 .fi-tabs-item.fi-active {
-    background-color: white;
+    background-color: transparent;
     color: var(--fi-color-gray-900);
-    box-shadow:
-        0 1px 2px 0 rgb(0 0 0 / 0.05),
-        0 1px 3px 0 rgb(0 0 0 / 0.04),
-        0 0 0 1px var(--fi-color-gray-200);
+    border-radius: 0;
+    box-shadow: inset 0 -2px 0 0 var(--fi-color-primary-500);
 }
 .dark .fi-tabs-item.fi-active {
-    background-color: var(--fi-color-gray-800);
+    background-color: transparent;
     color: var(--fi-color-gray-50);
-    box-shadow:
-        0 1px 2px 0 rgb(0 0 0 / 0.25),
-        0 0 0 1px var(--fi-color-gray-700);
+    box-shadow: inset 0 -2px 0 0 var(--fi-color-primary-500);
 }
 
 /*
@@ -1457,17 +1454,17 @@ h1.fi-header-heading::after {
 */
 
 .fi-sc-tabs.fi-contained {
-    background-color: white;
-    border: 1px solid var(--fi-color-gray-200);
-    border-radius: var(--fd-radius);
+    background-color: var(--fd-surface);
+    background-image: var(--fd-corners);
+    background-position: var(--fd-corner-pos);
+    background-repeat: no-repeat;
+    border: none;
+    border-radius: 2px;
     padding: 1rem 1.25rem 1.5rem;
-    box-shadow:
-        0 0 0 var(--fd-frame-gap) var(--fd-frame-gap-color),
-        0 0 0 calc(var(--fd-frame-gap) + 1px) var(--fd-frame-ring-color);
+    box-shadow: none;
 }
 .dark .fi-sc-tabs.fi-contained {
     background-color: var(--fi-color-gray-900);
-    border-color: var(--fi-color-gray-800);
 }
 
 /* Tab strip inside a contained block: drop the pill border so it reads
