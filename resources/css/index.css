@@ -429,6 +429,14 @@ body {
 .fi-sidebar-item.fi-active .fi-sidebar-item-icon {
     color: var(--fi-color-primary-500);
 }
+/* Filament applies text-primary-700 directly on the label span; override it
+   so the active label is dark cocoa ink (honey stays on the icon + brackets). */
+.fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-label {
+    color: var(--fi-color-gray-900);
+}
+.dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-label {
+    color: var(--fi-color-gray-50);
+}
 
 .fi-sidebar-item .fi-sidebar-item-btn {
     position: relative;
@@ -732,6 +740,26 @@ h1.fi-header-heading::after {
     border-color: color-mix(in oklch, var(--fi-color-primary-500) 30%, var(--fd-border-soft-light));
     color: var(--fi-color-gray-900);
 }
+
+/* Default (no-colour) secondary buttons are gray-non-outlined and ship white
+   from Filament; give them the same cream ghost pill so they don't read as
+   bright white blobs on the cream cards. */
+.fi-btn.fi-color-gray:not(.fi-outlined):not(.fi-link) {
+    background-color: var(--fd-surface);
+    border: 1px solid var(--fd-border-soft-light);
+    color: var(--fi-color-gray-800);
+    box-shadow: none;
+}
+.fi-btn.fi-color-gray:not(.fi-outlined):not(.fi-link):hover {
+    background-color: color-mix(in oklch, var(--fi-color-primary-400) 12%, var(--fd-surface));
+    border-color: color-mix(in oklch, var(--fi-color-primary-500) 30%, var(--fd-border-soft-light));
+    color: var(--fi-color-gray-900);
+}
+.dark .fi-btn.fi-color-gray:not(.fi-outlined):not(.fi-link) {
+    background-color: var(--fi-color-gray-900);
+    border-color: var(--fi-color-gray-700);
+    color: var(--fi-color-gray-100);
+}
 .dark .fi-btn.fi-outlined {
     background-color: var(--fi-color-gray-900);
     border-color: var(--fi-color-gray-700);
@@ -800,9 +828,9 @@ h1.fi-header-heading::after {
     background-color: var(--fi-color-gray-900);
 }
 
-.fi-input,
-.fi-fo-text-input,
-.fi-fo-textarea {
+/* Only the inner <input>/<textarea> is transparent — the wrapper keeps its
+   white fill so text fields stay white on the cream cards (not beige). */
+.fi-input {
     background-color: transparent;
     font-size: 0.9375rem;
     line-height: 1.5;
@@ -1410,26 +1438,28 @@ h1.fi-header-heading::after {
 .fi-tabs,
 .fi-page-tabs {
     background-color: transparent;
-    border-radius: var(--fd-pill);
-    padding: 0.3125rem;
-    display: inline-flex;
-    gap: 0.125rem;
-    border: 1px solid var(--fi-color-gray-200);
+    border-radius: 0;
+    padding: 0;
+    display: flex;
+    gap: 0.25rem;
+    border: none;
+    border-bottom: 1px solid var(--fd-border-soft-light);
 }
 .dark .fi-tabs,
 .dark .fi-page-tabs {
-    border-color: var(--fi-color-gray-800);
+    border-bottom-color: var(--fd-border-soft-dark);
 }
 
 .fi-tabs-item {
-    border-radius: var(--fd-pill);
-    padding: 0.5rem 1.125rem;
+    border-radius: 0;
+    padding: 0.5rem 0.875rem;
+    margin-bottom: -1px;
     font-weight: 600;
     font-size: 0.8125rem;
     color: var(--fi-color-gray-600);
     border: none;
     background: transparent;
-    transition: background-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
+    transition: color 140ms ease, box-shadow 140ms ease;
 }
 .dark .fi-tabs-item { color: var(--fi-color-gray-400); }
 
