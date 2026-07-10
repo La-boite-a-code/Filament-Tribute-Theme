@@ -1213,14 +1213,30 @@ h1.fi-header-heading::after {
 | dividers between <li> items and a shared white pill background. We keep
 | that group look, only flipping the active item to the primary honey.
 */
+.fi-pagination-items {
+    background-color: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    gap: 0.25rem;
+}
+.fi-pagination-item {
+    border: none;
+}
 .fi-pagination-item-btn {
     border-radius: 2px;
+    background-color: var(--fd-surface);
     box-shadow: none;
+}
+.dark .fi-pagination-item-btn {
+    background-color: var(--fi-color-gray-800);
 }
 .fi-pagination-item.fi-active .fi-pagination-item-btn {
     background-color: var(--fd-border-soft-light);
     background-image: none;
     box-shadow: none;
+}
+.dark .fi-pagination-item.fi-active .fi-pagination-item-btn {
+    background-color: var(--fi-color-gray-700);
 }
 .fi-pagination-item.fi-active .fi-pagination-item-label {
     color: oklch(0.28 0.02 45);
