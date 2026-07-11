@@ -683,30 +683,55 @@ body {
     box-shadow: 0 0 0 3px color-mix(in oklch, var(--fi-color-primary-500) var(--fd-glow-mix), transparent);
 }
 
-/* Primary — filamentphp.com signature CTA: honey PILL with dark cocoa ink
-   (not white text). Light brand fill, dark palette-950 label, subtle lift,
-   deepen the honey a step on hover. */
+/* Primary — filamentphp.com signature CTA: honey PILL with dark neutral ink
+   (not white text). On hover a dark circle scales up from the right edge and
+   floods the pill (clipped by overflow:hidden) while the label flips to a warm
+   cream — the exact "fill" interaction from the site, minus the arrow badge. */
 .fi-btn.fi-color-primary {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
     background-color: var(--fi-color-primary-400);
     background-image: none;
-    color: oklch(0.23 0.015 58);
+    color: oklch(0.216 0.006 56);
     border: none;
     box-shadow: none;
+    transition: color 300ms var(--fd-ease-out), transform 120ms ease;
+}
+.fi-btn.fi-color-primary::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 50%;
+    right: 0.25rem;
+    width: 2.5rem;
+    aspect-ratio: 1;
+    border-radius: var(--fd-pill);
+    background-color: oklch(0.216 0.006 56);
+    transform: translate(50%, -50%) scale(0);
+    transition: transform 460ms var(--fd-ease-out);
 }
 .fi-btn.fi-color-primary:hover {
-    background-color: var(--fi-color-primary-500);
-    border-color: color-mix(in oklch, var(--fi-color-primary-700) 38%, transparent);
-    box-shadow:
-        0 1px 2px 0 rgba(0, 0, 0, 0.06),
-        0 2px 6px -1px color-mix(in oklch, var(--fi-color-primary-700) 20%, transparent);
+    color: oklch(0.965 0.024 72);
+    background-color: var(--fi-color-primary-400);
+    box-shadow: none;
 }
-.fi-btn.fi-color-primary:active {
-    background-color: var(--fi-color-primary-600);
-    border-color: color-mix(in oklch, var(--fi-color-primary-800) 45%, transparent);
-    color: white;
-    box-shadow:
-        inset 0 1px 1px 0 rgba(0, 0, 0, 0.08),
-        0 1px 1px 0 color-mix(in oklch, var(--fi-color-primary-700) 12%, transparent);
+.fi-btn.fi-color-primary:hover::before {
+    transform: translate(50%, -50%) scale(16);
+}
+.fi-btn.fi-color-primary:active::before {
+    background-color: oklch(0.16 0.006 56);
+}
+/* Honour reduced-motion: skip the sweep, cross-fade to the dark fill. */
+@media (prefers-reduced-motion: reduce) {
+    .fi-btn.fi-color-primary::before {
+        transition: opacity 160ms linear;
+        transform: translate(50%, -50%) scale(16);
+        opacity: 0;
+    }
+    .fi-btn.fi-color-primary:hover::before {
+        opacity: 1;
+    }
 }
 
 /* Danger — quiet by default (soft red border), filled red on hover. P1 = solid. */
