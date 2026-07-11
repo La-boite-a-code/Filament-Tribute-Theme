@@ -775,6 +775,13 @@ body {
 .fi-btn.fi-size-sm {
     border-radius: var(--fd-pill);
 }
+/* Default (md) buttons — the header CTAs — match the site's chunkier 16px
+   pill. Smaller table/action buttons keep the base 15px so dense UIs stay
+   compact. */
+.fi-btn.fi-size-md {
+    font-size: 1rem;
+    padding-block: 0.5rem;
+}
 
 .fi-icon-btn {
     border-radius: var(--fd-radius-sm);
