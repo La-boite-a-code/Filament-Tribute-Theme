@@ -793,7 +793,7 @@ h1.fi-header-heading::after {
    like the site's "Filters" button, rather than bare icons. */
 .fi-ta-header-toolbar .fi-icon-btn,
 .fi-ta-filters-trigger-action-ctn .fi-icon-btn {
-    background-color: var(--fd-surface);
+    background-color: white;
     border: 1px solid var(--fd-border-soft-light);
 }
 .fi-ta-header-toolbar .fi-icon-btn:hover,
@@ -1057,13 +1057,15 @@ h1.fi-header-heading::after {
    Same Forge-style double frame as .fi-section: hairline border +
    palette-tinted outer ring with a canvas-coloured gap. */
 .fi-ta {
-    background-color: white;
-    border: 1px solid var(--fd-border-soft-light);
-    border-radius: var(--fd-radius);
+    background-color: var(--fd-surface);
+    background-image: var(--fd-corners);
+    background-position: var(--fd-corner-pos);
+    background-repeat: no-repeat;
+    border: none;
+    border-radius: 2px;
     box-shadow: none;
     --tw-ring-shadow: 0 0 #0000;
     --tw-shadow: 0 0 #0000;
-    overflow: hidden;
     position: relative;
 }
 .dark .fi-ta {
@@ -1309,7 +1311,7 @@ h1.fi-header-heading::after {
 .fi-ta-header-cell,
 .fi-ta-table > thead > tr > .fi-ta-selection-cell,
 .fi-ta-actions-header-cell {
-    background-color: var(--fi-color-gray-50);
+    background-color: transparent;
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: none;
@@ -1348,7 +1350,7 @@ h1.fi-header-heading::after {
 }
 
 .fi-ta-row:hover {
-    background-color: var(--fi-color-gray-50);
+    background-color: color-mix(in oklch, var(--fi-color-primary-500) 7%, transparent);
 }
 .dark .fi-ta-row:hover {
     background-color: color-mix(in oklch, var(--fi-color-gray-800) 50%, var(--fi-color-gray-900));
