@@ -16,6 +16,8 @@ All notable changes to `filament-tribute-theme` will be documented in this file.
   written with Filament's Tailwind utilities inside `@layer components`.
   The stylesheet shrinks from ~2,600 to under 500 lines and Filament keeps
   owning focus, invalid, disabled and responsive states.
+- Global search renders as the site's quiet cream pill, with its results panel
+  as a corner-tick card.
 - Primary buttons rely on Filament's contrast engine (honey-400 + dark ink);
   the theme only adds the pill and the filamentphp.com dark "flood" hover.
 - Palette switching no longer injects a `<body>` class through a render hook.

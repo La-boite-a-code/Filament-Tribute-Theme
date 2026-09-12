@@ -112,6 +112,17 @@
         @apply border-e border-(--tribute-line);
     }
 
+    /* Global search: the site's quiet "Search… ⌘K" pill, results as a card */
+    .fi-global-search .fi-input-wrp {
+        background-color: var(--tribute-surface);
+        @apply rounded-full ring-(--tribute-line);
+    }
+
+    .fi-global-search-results-ctn {
+        @apply tribute-card;
+        box-shadow: var(--tribute-shadow-lg);
+    }
+
     .fi-body-has-topbar .fi-sidebar-header {
         background-color: var(--tribute-canvas);
         @apply border-b border-(--tribute-line) ring-0 lg:shadow-none;
