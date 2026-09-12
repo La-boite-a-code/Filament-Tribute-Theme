@@ -1,10 +1,10 @@
-# FilamentDesign
+# Filament Tribute Theme
 
-A free Filament v5 theme paying homage to **Filament's own brand** — warm
-honey & cream surfaces, pill buttons with dark cocoa ink, soft pastel
-accents, and the Outfit + Albert Sans type pairing straight from the
-[Filament media kit](https://filamentphp.com/media-kit). Three brand
-palettes ship out of the box (Honey · Powder · Minty).
+A free Filament v5 theme paying homage to **filamentphp.com** — the warm
+off-white dotted canvas, cream cards marked by two corner ticks, honey pill
+buttons with dark ink, flat underlined tabs, and the Outfit + Albert Sans type
+pairing from the [Filament media kit](https://filamentphp.com/media-kit).
+Three brand palettes ship out of the box (Honey · Powder · Minty).
 
 One of a series of homage themes by
 [La Boite à Code](https://laboiteacode.fr).
@@ -14,9 +14,9 @@ One of a series of homage themes by
 ## Requirements
 
 - PHP `^8.2`
-- Laravel `^12.0`
+- Laravel `^12.0` or `^13.0`
 - Filament `^5.0`
-- Tailwind CSS `^4.0` (shipped with Filament v5)
+- Tailwind CSS `^4.1` with `@tailwindcss/vite` in the host application
 
 ---
 
@@ -25,17 +25,17 @@ One of a series of homage themes by
 ### 1. Pull the package
 
 ```bash
-composer require laboiteacode/filament-design
+composer require laboiteacode/filament-tribute-theme
 ```
 
 ### 2. Run the installer
 
 ```bash
-php artisan filament-design:install
+php artisan filament-tribute-theme:install
 ```
 
 This publishes:
-- `config/filament-design.php` — optional env-driven palette default
+- `config/filament-tribute-theme.php` — optional env-driven palette default
 - `resources/css/filament/admin/theme.css` — Filament panel theme entry-point
 
 ### 3. Wire the theme into your panel
@@ -44,15 +44,15 @@ Edit `app/Providers/Filament/AdminPanelProvider.php` and register both the
 theme stylesheet and the plugin:
 
 ```php
-use Laboiteacode\FilamentDesign\Enums\Palette;
-use Laboiteacode\FilamentDesign\FilamentDesignPlugin;
+use Laboiteacode\FilamentTributeTheme\Enums\Palette;
+use Laboiteacode\FilamentTributeTheme\FilamentTributeThemePlugin;
 
 public function panel(Panel $panel): Panel
 {
     return $panel
         ->viteTheme('resources/css/filament/admin/theme.css')
         ->plugin(
-            FilamentDesignPlugin::make()
+            FilamentTributeThemePlugin::make()
                 ->palette(Palette::Honey),
         );
 }
@@ -71,61 +71,63 @@ Reload the panel and the theme is live.
 
 ## Picking a palette
 
-Three brand palettes ship out of the box. Each one swaps the panel's
-`primary` color and applies a `.fd-palette-{name}` class on `<body>` so the
-CSS can remap `--fi-color-primary-*` tokens consistently.
+Each palette is a full 50–950 OKLCH scale registered as the panel's `primary`
+colour through Filament's own `->colors()` API. Filament exposes it as
+`--primary-{shade}` and resolves every component's contrast-aware shades from
+it, so buttons, focus rings, active navigation, badges and charts follow the
+palette with no extra CSS.
 
 ```php
-use Laboiteacode\FilamentDesign\Enums\Palette;
+use Laboiteacode\FilamentTributeTheme\Enums\Palette;
 
-FilamentDesignPlugin::make()->palette(Palette::Honey)  // #EFAF5D (default)
-FilamentDesignPlugin::make()->palette(Palette::Powder) // #AEC6F4
-FilamentDesignPlugin::make()->palette(Palette::Minty)  // #BFE6D9
+FilamentTributeThemePlugin::make()->palette(Palette::Honey)  // #EFAF5D (default)
+FilamentTributeThemePlugin::make()->palette(Palette::Powder) // #AEC6F4
+FilamentTributeThemePlugin::make()->palette(Palette::Minty)  // #BFE6D9
 ```
-
-Cards, callouts, sidebar active states, focus rings, primary buttons,
-notification dots and pagination chips all follow the chosen palette
-automatically — no further configuration needed.
 
 ### Driving the palette from env
 
-The plugin reads `config('filament-design.palette')` automatically when
-`->palette()` is not called explicitly. Set the env var and the panel
-follows — no extra wiring needed:
+When `->palette()` is not called, the plugin reads
+`config('filament-tribute-theme.palette')`:
 
 ```dotenv
-FILAMENT_DESIGN_PALETTE=powder
+FILAMENT_TRIBUTE_THEME_PALETTE=powder
 ```
 
-Supported values: `honey` (default), `powder`, `minty`. Calling
-`->palette(Palette::Powder)` always wins over the env value.
+Supported values: `honey` (default), `powder`, `minty`. An explicit
+`->palette()` call always wins over the env value.
 
 ---
 
 ## Plugin API
 
-All options are fluent and can be chained on `FilamentDesignPlugin::make()`.
+All options are fluent and can be chained on `FilamentTributeThemePlugin::make()`.
 
 | Method | Purpose | Default |
 | --- | --- | --- |
 | `palette(Palette $palette)` | Pick the brand palette | `Palette::Honey` |
-| `font(?string $font)` | Override the panel body font (`null` to leave Filament's choice) | `'Albert Sans'` |
+| `font(?string $font, ?string $url = null)` | Body font registered through Filament's `->font()` (`null` to keep the panel's own; `$url` for a custom stylesheet) | `'Albert Sans'` |
 | `maxContentWidth(bool\|string $value = true)` | `true` for `'full'`, any Filament preset string, or `false` to keep the panel's setting | `false` |
-| `colors(array $colors)` | Replace the auto-resolved color array with your own (`Color::hex()` / Filament palettes) | auto |
-| `withoutColors()` | Skip color injection entirely — keep the panel's `->colors()` untouched | enabled |
+| `colors(array $colors)` | Replace the auto-resolved colour array with your own (`Color::hex()` / Filament palettes / shade arrays) | auto |
+| `withoutColors()` | Skip colour registration entirely — keep the panel's `->colors()` untouched | enabled |
 
-> Headings render in **Outfit** and body text in **Albert Sans** (Filament's
-> brand typefaces), loaded by the published `theme.css`. `font()` overrides the
-> body face only.
+By default the plugin registers the palette as `primary`, warm `Color::Stone`
+grays (the site's text colours) and Filament's stock `info` / `success` /
+`warning` / `danger` scales.
+
+> Headings render in **Outfit** (imported from Bunny Fonts by the published
+> `theme.css`) and body text in **Albert Sans** (registered through Filament's
+> `->font()`, served by Bunny Fonts with italics). Pass your own family, and
+> optionally a stylesheet URL, to `font()` to change it.
 
 ### Example — full configuration
 
 ```php
 use Filament\Support\Colors\Color;
-use Laboiteacode\FilamentDesign\Enums\Palette;
-use Laboiteacode\FilamentDesign\FilamentDesignPlugin;
+use Laboiteacode\FilamentTributeTheme\Enums\Palette;
+use Laboiteacode\FilamentTributeTheme\FilamentTributeThemePlugin;
 
-FilamentDesignPlugin::make()
+FilamentTributeThemePlugin::make()
     ->palette(Palette::Powder)
     ->maxContentWidth('full')
     ->colors([
@@ -136,85 +138,81 @@ FilamentDesignPlugin::make()
 
 ---
 
-## What the theme styles
+## How the theme is built
 
-Out of the box, FilamentDesign restyles every Filament v5 surface to match
-the filamentphp.com art direction:
+The stylesheet is deliberately small (under 500 lines) because it leans on
+Filament's own CSS architecture instead of restyling it:
 
-- **Buttons** — honey **pill** with dark cocoa ink (the site's signature CTA),
-  quiet ghost/outlined secondaries, focus glow at the panel's primary
-- **Canvas** — warm cream / peach wash so the panel reads like the marketing
-  site rather than a flat white admin
-- **Sections & cards** — soft rounded surfaces on cream, hairline warm borders,
-  gentle elevation
-- **Tables** — flat header band, hairline row dividers, primary-tinted hover,
-  pastel status badges, honey pagination
-- **Forms** — inputs with honey required marks, honey focus glow, fieldset
-  framing, reactive validation states
-- **Notifications** — toasts with severity-tinted left edge; database panel
-  reads as a clean list with the unread dot in the primary color
-- **Sidebar** — tinted honey gradient active state with a primary edge bar,
-  dark-ink badges on the current item, group titles with refined tracking;
-  the active treatment auto-simplifies to a colored icon when collapsed
-- **Modals** — header/content/footer mirror the section structure
-- **Tabs** — segmented pill on contained tabs, underlined inline tabs
-- **Page headers** — bold Outfit display titles with a honey period accent
+- **Colours are Filament's.** Every rule reads the runtime variables Filament
+  injects — `--primary-*`, `--gray-*`, `--success-*`… — and `--color-*` inside
+  a `.fi-color-*` scope. No parallel scales, no remapping.
+- **Contrast is Filament's.** Filament v5 already paints primary buttons in
+  honey‑400 with dark ink because white text on honey‑600 fails WCAG AA. The
+  theme only adds the pill shape and the site's dark "flood" hover.
+- **Utilities are Filament's.** Rules are written with `@apply` and the `dark`
+  variant Filament defines, inside `@layer components` right after Filament's
+  own layer. The normal cascade applies, so Filament keeps owning focus,
+  invalid, disabled and responsive states without them being restated.
+
+What it does restyle, to match filamentphp.com:
+
+- **Canvas** — the site's `#faf9f5` off-white with the dotted pattern; the
+  topbar and sidebar sit on it with tan hairlines
+- **Cards** — sections, tables, stats, dropdowns, modals and the auth card
+  become cream surfaces with two diagonal corner ticks
+- **Buttons** — pills; cream ghost secondaries; quiet outlined danger
+- **Sidebar** — corner-bracket active item with dark ink and a honey icon,
+  tracked uppercase group labels
+- **Tabs** — flat strip with a honey underline
+- **Tables** — tan dividers, honey-tinted hover, tan pagination squares
+- **Typography** — Outfit for page, section, modal and stat headings on Stone
+  ink
 
 ---
 
 ## Customizing tokens
 
-FilamentDesign exposes a handful of CSS custom properties so you can tweak
-geometry without rewriting selectors. Add overrides in your panel's theme
-CSS, **after** the package import:
+Override the handful of custom properties in your panel's theme CSS,
+**after** the package import:
 
 ```css
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
-@import '../../../../vendor/laboiteacode/filament-design/resources/css/index.css';
+@import '../../../../vendor/laboiteacode/filament-tribute-theme/resources/css/index.css';
 
-/* Your overrides */
 :root {
-    --fd-radius-sm: 0.375rem;    /* tighter buttons */
-    --fd-radius:    0.625rem;    /* softer cards */
-    --fd-frame-gap: 4px;         /* wider double-frame gap */
-}
-
-.dark {
-    --fd-frame-ring-color: oklch(0.30 0.005 75);
+    --tribute-radius: 0.5rem;                 /* rounder cards */
+    --tribute-surface: white;                 /* white cards instead of cream */
 }
 ```
 
-Available tokens:
-
 | Token | Role |
 | --- | --- |
-| `--fd-radius-xs` / `-sm` / `--fd-radius` / `-lg` | Corner radius scale |
-| `--fd-pill` | Pill radius (buttons, badges, segmented tabs) |
-| `--fd-stroke` | Default border thickness |
-| `--fd-border-soft-light` / `-dark` | Hairline divider colour, per mode |
-| `--fd-canvas` | Body canvas colour |
-| `--fd-frame-gap` | Gap between inner border and outer ring |
-| `--fd-frame-gap-color` | Gap fill colour (defaults to canvas) |
-| `--fd-frame-ring-color` | Outer ring colour |
-| `--fd-shadow-sm` / `--fd-shadow-lg` | Elevation scale |
-| `--fd-glow-mix` | Focus glow intensity (0–100%) |
-| `--fd-duration-slow` | Motion timing |
-| `--fd-ease-out` | Motion curve |
+| `--tribute-canvas` | Body canvas colour |
+| `--tribute-surface` | Card surface colour |
+| `--tribute-line` | Hairline / divider colour |
+| `--tribute-corner-tl` / `--tribute-corner-br` | Corner tick images |
+| `--tribute-corners` / `--tribute-corner-pos` | Which ticks are drawn, and where |
+| `--tribute-radius` | Card corner radius |
+| `--tribute-shadow-lg` | Dropdown / modal elevation |
+| `--tribute-ease-out` | Motion curve |
 
-Two opt-in utility classes are also available: `.fd-eyebrow` (uppercase
-tracked eyebrow text) and `.fd-display` (Outfit display heading).
+`--tribute-canvas`, `--tribute-surface`, `--tribute-line`, the corner ticks and
+`--tribute-shadow-lg` are redefined under `.dark`; override them there too.
+
+Three opt-in utility classes are available in your own Blade views:
+`tribute-card` (cream surface with corner ticks), `tribute-display` (Outfit display
+heading) and `tribute-eyebrow` (uppercase tracked eyebrow text).
 
 ---
 
 ## How it's compiled
 
-FilamentDesign ships only source CSS — no precompiled bundle. The host
-app's Vite/Tailwind pipeline picks up the package's
-`resources/css/index.css` through the theme entrypoint published to
+Filament Tribute Theme ships only source CSS — no precompiled bundle. The host app's
+Vite/Tailwind pipeline picks up the package's `resources/css/index.css`
+through the theme entry-point published to
 `resources/css/filament/admin/theme.css`, alongside Filament's own theme
-import. That keeps Tailwind's `@source` scanning aware of both your panel
-classes and the package's selectors, so unused utilities are pruned in
-your build like any other dependency.
+import. Tailwind's `@source` scanning stays aware of your panel classes, so
+unused utilities are pruned in your build like any other dependency.
 
 ---
 

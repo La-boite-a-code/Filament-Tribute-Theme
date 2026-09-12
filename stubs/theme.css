@@ -1,7 +1,13 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@400..800&family=Albert+Sans:ital,wght@0,400..700;1,400..700&display=swap");
+/*
+| Filament Tribute Theme entry-point.
+|
+| Albert Sans (body) is loaded by the plugin through Filament's own
+| `->font()` API (Bunny Fonts); only the Outfit display face needs importing
+| here. Font imports must come before any other CSS.
+*/
+@import url("https://fonts.bunny.net/css?family=outfit:500,600,700&display=swap");
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
-@import '../../../../vendor/laboiteacode/filament-design/resources/css/index.css';
+@import '../../../../vendor/laboiteacode/filament-tribute-theme/resources/css/index.css';
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
-@source '../../../../vendor/laboiteacode/filament-design/resources/views/**/*';

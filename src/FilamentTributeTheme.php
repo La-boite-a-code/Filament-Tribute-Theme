@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Laboiteacode\FilamentDesign;
+namespace Laboiteacode\FilamentTributeTheme;
 
-class FilamentDesign
+class FilamentTributeTheme
 {
     public function version(): string
     {

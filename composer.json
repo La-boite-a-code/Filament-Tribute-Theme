@@ -1,19 +1,19 @@
 {
-    "name": "laboiteacode/filament-design",
+    "name": "laboiteacode/filament-tribute-theme",
     "description": "A free Filament v5 theme paying homage to Filament's own brand — honey & cream surfaces, soft pastel accents, Outfit + Albert Sans. Part of a series of homage themes.",
     "keywords": [
         "laboiteacode",
         "honey",
-        "filament-design",
+        "filament-tribute-theme",
         "filament",
         "filament-theme",
         "filament-plugin",
         "homage-theme"
     ],
-    "homepage": "https://github.com/laboiteacode/filament-design",
+    "homepage": "https://github.com/La-boite-a-code/Filament-Tribute-Theme",
     "support": {
-        "issues": "https://github.com/laboiteacode/filament-design/issues",
-        "source": "https://github.com/laboiteacode/filament-design"
+        "issues": "https://github.com/La-boite-a-code/Filament-Tribute-Theme/issues",
+        "source": "https://github.com/La-boite-a-code/Filament-Tribute-Theme"
     },
     "license": "MIT",
     "authors": [
@@ -26,30 +26,30 @@
     "require": {
         "php": "^8.2",
         "filament/filament": "^5.0",
-        "spatie/laravel-package-tools": "^1.15.0"
+        "spatie/laravel-package-tools": "^1.93"
     },
     "require-dev": {
-        "larastan/larastan": "^3.0",
-        "laravel/pint": "^1.0",
-        "nunomaduro/collision": "^8.0",
-        "orchestra/testbench": "^10.0",
-        "pestphp/pest": "^3.0",
-        "pestphp/pest-plugin-arch": "^3.0",
-        "pestphp/pest-plugin-laravel": "^3.0",
-        "phpstan/extension-installer": "^1.3",
+        "larastan/larastan": "^3.10",
+        "laravel/pint": "^1.29",
+        "nunomaduro/collision": "^8.9",
+        "orchestra/testbench": "^10.0 || ^11.0",
+        "pestphp/pest": "^3.8 || ^4.0 || ^5.0",
+        "pestphp/pest-plugin-arch": "^3.1 || ^4.0 || ^5.0",
+        "pestphp/pest-plugin-laravel": "^3.2 || ^4.0 || ^5.0",
+        "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
-        "rector/rector": "^2.0"
+        "rector/rector": "^2.5"
     },
     "autoload": {
         "psr-4": {
-            "Laboiteacode\\FilamentDesign\\": "src/",
-            "Laboiteacode\\FilamentDesign\\Database\\Factories\\": "database/factories/"
+            "Laboiteacode\\FilamentTributeTheme\\": "src/",
+            "Laboiteacode\\FilamentTributeTheme\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Laboiteacode\\FilamentDesign\\Tests\\": "tests/"
+            "Laboiteacode\\FilamentTributeTheme\\Tests\\": "tests/"
         }
     },
     "scripts": {
@@ -70,7 +70,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Laboiteacode\\FilamentDesign\\FilamentDesignServiceProvider"
+                "Laboiteacode\\FilamentTributeTheme\\FilamentTributeThemeServiceProvider"
             ]
         }
     },

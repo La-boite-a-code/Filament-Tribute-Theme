@@ -1,0 +1,7 @@
+/*
+| Compile check only — not shipped. Builds the theme against Filament's own
+| stylesheet exactly like a host application's theme.css does, so a missing
+| utility in an `@apply` or an invalid variant fails `npm run build`.
+*/
+@import '../../vendor/filament/filament/resources/css/theme.css';
+@import './index.css';

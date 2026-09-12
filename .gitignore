@@ -1,6 +1,7 @@
 /vendor
 /node_modules
 /build
+/resources/dist
 composer.lock
 package-lock.json
 .phpunit.result.cache

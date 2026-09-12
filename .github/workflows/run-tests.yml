@@ -13,9 +13,12 @@ jobs:
       fail-fast: true
       matrix:
         os: [ubuntu-latest]
-        php: [8.2, 8.3, 8.4]
-        laravel: [12.*]
+        php: [8.2, 8.3, 8.4, 8.5]
+        laravel: [12.*, 13.*]
         stability: [prefer-stable]
+        exclude:
+          - php: 8.2
+            laravel: 13.*
 
     name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
@@ -36,3 +39,29 @@ jobs:
 
       - name: Execute tests
         run: vendor/bin/pest
+
+  build-css:
+    runs-on: ubuntu-latest
+    name: Compile theme against Filament
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          coverage: none
+
+      - name: Install Filament
+        run: composer update --prefer-stable --prefer-dist --no-interaction
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Compile
+        run: |
+          npm install
+          npm run build
