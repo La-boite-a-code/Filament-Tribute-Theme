@@ -6,7 +6,7 @@ use Laboiteacode\FilamentTributeTheme\FilamentTributeTheme;
 use Laboiteacode\FilamentTributeTheme\FilamentTributeThemePlugin;
 
 it('has a version', function (): void {
-    expect((new FilamentTributeTheme)->version())->toBe('0.1.0');
+    expect((new FilamentTributeTheme)->version())->toBe('1.0.0');
 });
 
 it('exposes a plugin id', function (): void {

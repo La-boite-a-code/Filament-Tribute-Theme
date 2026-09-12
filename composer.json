@@ -1,14 +1,14 @@
 {
     "name": "laboiteacode/filament-tribute-theme",
-    "description": "A free Filament v5 theme paying homage to Filament's own brand — honey & cream surfaces, soft pastel accents, Outfit + Albert Sans. Part of a series of homage themes.",
+    "description": "A free Filament v5 theme paying tribute to filamentphp.com: cream corner-tick cards, honey pill buttons, Outfit headings, built on Filament's own CSS variables. Honey, Powder and Minty palettes.",
     "keywords": [
         "laboiteacode",
-        "honey",
-        "filament-tribute-theme",
         "filament",
         "filament-theme",
         "filament-plugin",
-        "homage-theme"
+        "filament-tribute-theme",
+        "theme",
+        "tribute"
     ],
     "homepage": "https://github.com/La-boite-a-code/Filament-Tribute-Theme",
     "support": {
