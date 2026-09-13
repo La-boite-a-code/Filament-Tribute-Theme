@@ -17,6 +17,9 @@ ship out of the box (Honey · Powder · Minty).
 
 ![Filament Tribute Theme](art/banner.jpg)
 
+> Screenshots of each palette, in light and dark mode, are in
+> [Picking a palette](#picking-a-palette).
+
 ## Table of contents
 
 - [Why this theme](#why-this-theme)
@@ -131,6 +134,40 @@ FILAMENT_TRIBUTE_THEME_PALETTE=powder
 
 Supported values: `honey` (default), `powder`, `minty`. An explicit
 `->palette()` call always wins over the env value.
+
+### Honey
+
+The Filament signature, and the default. Filament's contrast engine pairs it
+with dark ink, exactly like the calls to action on filamentphp.com.
+
+| Light | Dark |
+| --- | --- |
+| ![Honey palette, light mode](art/palette-honey-light.png) | ![Honey palette, dark mode](art/palette-honey-dark.png) |
+
+### Powder
+
+The soft blue from the media kit, for panels that need a cooler accent on the
+same cream material.
+
+| Light | Dark |
+| --- | --- |
+| ![Powder palette, light mode](art/palette-powder-light.png) | ![Powder palette, dark mode](art/palette-powder-dark.png) |
+
+### Minty
+
+The soft green from the media kit, the quietest of the three.
+
+| Light | Dark |
+| --- | --- |
+| ![Minty palette, light mode](art/palette-minty-light.png) | ![Minty palette, dark mode](art/palette-minty-dark.png) |
+
+Override individual slots on top of a palette:
+
+```php
+FilamentTributeThemePlugin::make()
+    ->palette(Palette::Powder)
+    ->colors(['gray' => Color::Zinc, 'warning' => Color::hex('#F59E0B')]);
+```
 
 ## Plugin API
 

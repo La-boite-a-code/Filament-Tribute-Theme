@@ -23,3 +23,4 @@ First release.
   utilities for custom Blade views.
 - Tested on PHP 8.2–8.5 with Laravel 12 and 13; a CI job compiles the theme
   against Filament so an invalid utility fails the build.
+- Cover art plus panel screenshots of each palette in light and dark mode.
