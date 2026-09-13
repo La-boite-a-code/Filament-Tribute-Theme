@@ -15,10 +15,8 @@ class FilamentTributeThemeServiceProvider extends PackageServiceProvider
     public function configurePackage(Package $package): void
     {
         $package->name(static::$name)
-            ->hasConfigFile(static::$name)
             ->hasInstallCommand(function (InstallCommand $command): void {
                 $command
-                    ->publishConfigFile()
                     ->endWith(function (InstallCommand $command): void {
                         $command->call('vendor:publish', [
                             '--tag' => 'filament-tribute-theme-css',

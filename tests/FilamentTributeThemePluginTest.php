@@ -4,46 +4,43 @@ declare(strict_types=1);
 
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
-use Laboiteacode\FilamentTributeTheme\Enums\Palette;
 use Laboiteacode\FilamentTributeTheme\FilamentTributeThemePlugin;
 
-it('registers the honey palette, stone grays and the brand font by default', function (): void {
+it('registers honey, stone grays and the brand font by default', function (): void {
     $panel = makePanel();
 
     FilamentTributeThemePlugin::make()->register($panel);
 
     expect($panel->getColors())
         ->toHaveKeys(['primary', 'gray', 'info', 'success', 'warning', 'danger'])
-        ->and($panel->getColors()['primary'])->toBe(Palette::Honey->shades())
+        ->and($panel->getColors()['primary'])->toBe(FilamentTributeThemePlugin::HONEY)
         ->and($panel->getColors()['gray'])->toBe(Color::Stone)
         ->and($panel->getFontFamily())->toBe('Albert Sans')
         ->and($panel->getFontUrl())->toContain('fonts.bunny.net')->toContain('400i');
 });
 
-it('registers the chosen palette as the primary colour', function (Palette $palette): void {
-    $panel = makePanel();
+it('ships honey as a full oklch scale, monotonically darker from 50 to 950', function (): void {
+    $shades = FilamentTributeThemePlugin::HONEY;
 
-    FilamentTributeThemePlugin::make()->palette($palette)->register($panel);
+    expect(array_keys($shades))->toBe([50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]);
 
-    expect($panel->getColors()['primary'])->toBe($palette->shades());
-})->with(Palette::cases());
+    foreach ($shades as $shade) {
+        expect($shade)->toMatch('/^oklch\(\d\.\d+ \d\.\d+ \d+(\.\d+)?\)$/');
+    }
 
-it('reads the palette from the published config when not set explicitly', function (): void {
-    config()->set('filament-tribute-theme.palette', 'minty');
+    $lightness = array_map(
+        static fn (string $shade): float => (float) sscanf($shade, 'oklch(%f %f %f)')[0],
+        array_values($shades),
+    );
 
-    expect(FilamentTributeThemePlugin::make()->getPalette())->toBe(Palette::Minty);
+    $sorted = $lightness;
+    rsort($sorted);
+
+    expect($lightness)->toBe($sorted);
 });
 
-it('falls back to honey when the configured palette is unknown', function (): void {
-    config()->set('filament-tribute-theme.palette', 'neon');
-
-    expect(FilamentTributeThemePlugin::make()->getPalette())->toBe(Palette::Honey);
-});
-
-it('lets an explicit palette win over the config', function (): void {
-    config()->set('filament-tribute-theme.palette', 'minty');
-
-    expect(FilamentTributeThemePlugin::make()->palette(Palette::Powder)->getPalette())->toBe(Palette::Powder);
+it('anchors honey on the media kit colour at shade 400', function (): void {
+    expect(FilamentTributeThemePlugin::HONEY[400])->toBe('oklch(0.798 0.124 71)');
 });
 
 it('keeps the panel colours untouched with withoutColors()', function (): void {

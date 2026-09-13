@@ -8,10 +8,34 @@ use Closure;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Filament\Support\Colors\Color;
-use Laboiteacode\FilamentTributeTheme\Enums\Palette;
 
 class FilamentTributeThemePlugin implements Plugin
 {
+    /**
+     * Honey — the filamentphp.com signature, anchored on the media kit's
+     * #EFAF5D at shade 400 and deepening toward Cocoa for the UI shades.
+     *
+     * The scale is hand-tuned rather than generated: Filament picks button,
+     * badge and link shades by contrast, and a generated scale drifts away
+     * from the brand — the honey turns orange at the dark end and the calls
+     * to action lose the dark ink they have on the site.
+     *
+     * @var array<int, string>
+     */
+    public const HONEY = [
+        50 => 'oklch(0.982 0.014 82)',
+        100 => 'oklch(0.963 0.030 82)',
+        200 => 'oklch(0.928 0.058 80)',
+        300 => 'oklch(0.880 0.082 76)',
+        400 => 'oklch(0.798 0.124 71)',
+        500 => 'oklch(0.760 0.108 68)',
+        600 => 'oklch(0.670 0.110 62)',
+        700 => 'oklch(0.560 0.098 57)',
+        800 => 'oklch(0.460 0.076 53)',
+        900 => 'oklch(0.380 0.056 50)',
+        950 => 'oklch(0.265 0.040 48)',
+    ];
+
     /**
      * @var array<string, mixed>
      */
@@ -29,8 +53,6 @@ class FilamentTributeThemePlugin implements Plugin
 
     protected bool|string $maxContentWidth = false;
 
-    protected ?Palette $palette = null;
-
     public function getId(): string
     {
         return 'filament-tribute-theme';
@@ -39,7 +61,7 @@ class FilamentTributeThemePlugin implements Plugin
     public function register(Panel $panel): void
     {
         if ($this->registerColors) {
-            $panel->colors($this->resolveColors($this->getPalette()));
+            $panel->colors($this->resolveColors());
         }
 
         if ($this->font !== null) {
@@ -70,33 +92,8 @@ class FilamentTributeThemePlugin implements Plugin
     }
 
     /**
-     * Pick the brand palette: Honey (default), Powder, or Minty.
-     */
-    public function palette(Palette $palette): static
-    {
-        $this->palette = $palette;
-
-        return $this;
-    }
-
-    /**
-     * The active palette: an explicit `->palette()` call wins; otherwise the
-     * published config value (driven by `FILAMENT_TRIBUTE_THEME_PALETTE`); otherwise
-     * Honey.
-     */
-    public function getPalette(): Palette
-    {
-        if ($this->palette instanceof Palette) {
-            return $this->palette;
-        }
-
-        $configured = (string) config('filament-tribute-theme.palette', Palette::Honey->value);
-
-        return Palette::tryFrom($configured) ?? Palette::Honey;
-    }
-
-    /**
-     * Override the colour array registered on the panel.
+     * Override the colour array registered on the panel. Pass your own
+     * `primary` to brand the theme without losing the rest of its material.
      *
      * @param  array<string, mixed>  $colors
      */
@@ -143,19 +140,19 @@ class FilamentTributeThemePlugin implements Plugin
     }
 
     /**
-     * The brand palette as the primary colour, warm Stone grays (the
-     * filamentphp.com text colours) and Filament's stock semantic colours.
+     * Honey as the primary colour, warm Stone grays (the site's text
+     * colours) and Filament's stock semantic colours.
      *
      * @return array<string, mixed>
      */
-    protected function resolveColors(Palette $palette): array
+    protected function resolveColors(): array
     {
         if ($this->colors !== []) {
             return $this->collapseClosures($this->colors);
         }
 
         return [
-            'primary' => $palette->shades(),
+            'primary' => static::HONEY,
             'gray' => Color::Stone,
             'info' => Color::Sky,
             'success' => Color::Emerald,

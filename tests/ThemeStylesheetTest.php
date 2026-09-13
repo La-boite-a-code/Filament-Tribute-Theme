@@ -21,13 +21,10 @@ it('only reads colour scales that Filament registers on the panel', function ():
         ->each->toBeIn(['primary', 'gray', 'success', 'warning', 'danger', 'info', 'color']);
 });
 
-it('does not ship its own colour scales or palette body classes', function (): void {
+it('does not ship its own colour scales', function (): void {
     expect($this->css)
         ->not->toContain('--fi-color-')
-        ->not->toContain('-palette-')
-        ->not->toContain('--color-honey')
-        ->not->toContain('--color-powder')
-        ->not->toContain('--color-minty');
+        ->not->toContain('--color-honey');
 });
 
 it('layers its component overrides like Filament does', function (): void {
