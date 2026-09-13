@@ -12,20 +12,20 @@ A free Filament v5 theme paying tribute to **filamentphp.com**: the warm
 off-white dotted canvas, cream cards marked by two corner ticks, honey pill
 buttons with the site's dark "flood" hover, flat underlined tabs and the
 Outfit + Albert Sans type pairing from the
-[Filament media kit](https://filamentphp.com/media-kit). Three brand palettes
-ship out of the box (Honey · Powder · Minty).
+[Filament media kit](https://filamentphp.com/media-kit).
 
 ![Filament Tribute Theme](art/banner.jpg)
 
-> Screenshots of each palette, in light and dark mode, are in
-> [Picking a palette](#picking-a-palette).
+| Light | Dark |
+| --- | --- |
+| ![The theme in light mode](art/screenshot-light.png) | ![The theme in dark mode](art/screenshot-dark.png) |
 
 ## Table of contents
 
 - [Why this theme](#why-this-theme)
 - [Requirements](#requirements)
 - [Installation](#installation)
-- [Picking a palette](#picking-a-palette)
+- [Colours](#colours)
 - [Plugin API](#plugin-api)
 - [How the theme is built](#how-the-theme-is-built)
 - [Customizing tokens](#customizing-tokens)
@@ -67,10 +67,8 @@ composer require laboiteacode/filament-tribute-theme
 php artisan filament-tribute-theme:install
 ```
 
-This publishes:
-
-- `config/filament-tribute-theme.php` — optional env-driven palette default
-- `resources/css/filament/admin/theme.css` — the panel theme entry-point
+This publishes `resources/css/filament/admin/theme.css`, the panel theme
+entry-point.
 
 If your panel already has a theme entry-point, add the two imports from the
 published stub to it instead (Filament's `theme.css` first, then the package).
@@ -81,17 +79,13 @@ Edit `app/Providers/Filament/AdminPanelProvider.php` and register both the
 theme stylesheet and the plugin:
 
 ```php
-use Laboiteacode\FilamentTributeTheme\Enums\Palette;
 use Laboiteacode\FilamentTributeTheme\FilamentTributeThemePlugin;
 
 public function panel(Panel $panel): Panel
 {
     return $panel
         ->viteTheme('resources/css/filament/admin/theme.css')
-        ->plugin(
-            FilamentTributeThemePlugin::make()
-                ->palette(Palette::Honey),
-        );
+        ->plugin(FilamentTributeThemePlugin::make());
 }
 ```
 
@@ -107,67 +101,39 @@ npm run dev        # development (HMR)
 
 Reload the panel and the theme is live.
 
-## Picking a palette
+## Colours
 
-Each palette is a full 50–950 OKLCH scale registered as the panel's `primary`
-colour through Filament's own `->colors()` API. Filament exposes it as
-`--primary-{shade}` and resolves every component's contrast-aware shades from
-it, so buttons, focus rings, active navigation, badges and charts follow the
-palette with no extra CSS.
+The theme registers one brand colour: **honey**, the filamentphp.com
+signature, anchored on the media kit's `#EFAF5D`. It is a full 50–950 OKLCH
+scale registered as the panel's `primary` through Filament's own `->colors()`
+API, so buttons, focus rings, active navigation, badges and charts resolve
+their contrast-aware shades from it with no extra CSS.
 
-```php
-use Laboiteacode\FilamentTributeTheme\Enums\Palette;
+The scale is hand-tuned rather than generated. Filament picks button, badge
+and link shades by contrast, and a generated scale drifts away from the
+brand: the honey turns orange at the dark end and the calls to action lose
+the dark ink they have on the site.
 
-FilamentTributeThemePlugin::make()->palette(Palette::Honey)  // #EFAF5D (default)
-FilamentTributeThemePlugin::make()->palette(Palette::Powder) // #AEC6F4
-FilamentTributeThemePlugin::make()->palette(Palette::Minty)  // #BFE6D9
-```
+Alongside it the plugin registers warm `Color::Stone` grays — the site's own
+text colours — and Filament's stock `info`, `success`, `warning` and `danger`
+scales.
 
-### Driving the palette from env
+### Using your own brand colour
 
-When `->palette()` is not called, the plugin reads
-`config('filament-tribute-theme.palette')`:
-
-```dotenv
-FILAMENT_TRIBUTE_THEME_PALETTE=powder
-```
-
-Supported values: `honey` (default), `powder`, `minty`. An explicit
-`->palette()` call always wins over the env value.
-
-### Honey
-
-The Filament signature, and the default. Filament's contrast engine pairs it
-with dark ink, exactly like the calls to action on filamentphp.com.
-
-| Light | Dark |
-| --- | --- |
-| ![Honey palette, light mode](art/palette-honey-light.png) | ![Honey palette, dark mode](art/palette-honey-dark.png) |
-
-### Powder
-
-The soft blue from the media kit, for panels that need a cooler accent on the
-same cream material.
-
-| Light | Dark |
-| --- | --- |
-| ![Powder palette, light mode](art/palette-powder-light.png) | ![Powder palette, dark mode](art/palette-powder-dark.png) |
-
-### Minty
-
-The soft green from the media kit, the quietest of the three.
-
-| Light | Dark |
-| --- | --- |
-| ![Minty palette, light mode](art/palette-minty-light.png) | ![Minty palette, dark mode](art/palette-minty-dark.png) |
-
-Override individual slots on top of a palette:
+Pass any colour to `colors()` to keep the theme's material with your own
+accent:
 
 ```php
+use Filament\Support\Colors\Color;
+
 FilamentTributeThemePlugin::make()
-    ->palette(Palette::Powder)
-    ->colors(['gray' => Color::Zinc, 'warning' => Color::hex('#F59E0B')]);
+    ->colors([
+        'primary' => Color::hex('#7c3aed'),
+        'gray' => Color::Stone,
+    ]);
 ```
+
+Or leave the panel's existing `->colors()` untouched with `withoutColors()`.
 
 ## Plugin API
 
@@ -175,15 +141,14 @@ All options are fluent and can be chained on `FilamentTributeThemePlugin::make()
 
 | Method | Purpose | Default |
 | --- | --- | --- |
-| `palette(Palette $palette)` | Pick the brand palette | `Palette::Honey` |
 | `font(?string $font, ?string $url = null)` | Body font registered through Filament's `->font()` (`null` to keep the panel's own; `$url` for a custom stylesheet) | `'Albert Sans'` |
 | `maxContentWidth(bool\|string $value = true)` | `true` for `'full'`, any Filament preset string, or `false` to keep the panel's setting | `false` |
 | `colors(array $colors)` | Replace the auto-resolved colour array with your own (`Color::hex()` / Filament palettes / shade arrays) | auto |
 | `withoutColors()` | Skip colour registration entirely — keep the panel's `->colors()` untouched | enabled |
 
-By default the plugin registers the palette as `primary`, warm `Color::Stone`
-grays (the site's text colours) and Filament's stock `info` / `success` /
-`warning` / `danger` scales.
+By default the plugin registers honey as `primary`, warm `Color::Stone` grays
+(the site's text colours) and Filament's stock `info` / `success` / `warning`
+/ `danger` scales.
 
 > Headings render in **Outfit** (imported from Bunny Fonts by the published
 > `theme.css`) and body text in **Albert Sans** (registered through Filament's
@@ -194,12 +159,11 @@ grays (the site's text colours) and Filament's stock `info` / `success` /
 
 ```php
 use Filament\Support\Colors\Color;
-use Laboiteacode\FilamentTributeTheme\Enums\Palette;
 use Laboiteacode\FilamentTributeTheme\FilamentTributeThemePlugin;
 
 FilamentTributeThemePlugin::make()
-    ->palette(Palette::Powder)
     ->maxContentWidth('full')
+    ->font('Albert Sans')
     ->colors([
         'primary' => Color::hex('#7c3aed'),
         'gray' => Color::Stone,

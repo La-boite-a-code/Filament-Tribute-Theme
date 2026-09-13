@@ -5,8 +5,8 @@
 |
 | Built on Filament's own CSS architecture, which is why it stays small:
 |
-|   • Colours come from the panel. The plugin registers the brand palette
-|     through `$panel->colors()`, so every rule below reads the runtime
+|   • Colours come from the panel. The plugin registers the honey brand
+|     scale through `$panel->colors()`, so every rule below reads the runtime
 |     variables Filament injects — `--primary-*`, `--gray-*`, `--success-*`…
 |     and `--color-*` / `--bg` inside a `.fi-color-*` scope. Nothing is
 |     remapped. Filament's contrast engine already picks honey-400 + dark
