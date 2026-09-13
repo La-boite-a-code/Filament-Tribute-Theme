@@ -1,3 +1,11 @@
+<!--
+    The blocks marked `filament-hidden` are stripped when this file is rendered
+    on filamentphp.com, which shows the plugin name, thumbnail and package
+    metadata itself. They stay visible on GitHub.
+-->
+
+<div class="filament-hidden">
+
 # Filament Tribute Theme
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/laboiteacode/filament-tribute-theme.svg?style=flat-square)](https://packagist.org/packages/laboiteacode/filament-tribute-theme)
@@ -5,6 +13,8 @@
 [![Static Analysis](https://img.shields.io/github/actions/workflow/status/la-boite-a-code/filament-tribute-theme/phpstan.yml?branch=main&label=phpstan&style=flat-square)](https://github.com/la-boite-a-code/filament-tribute-theme/actions/workflows/phpstan.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/laboiteacode/filament-tribute-theme.svg?style=flat-square)](https://packagist.org/packages/laboiteacode/filament-tribute-theme)
 [![License](https://img.shields.io/packagist/l/laboiteacode/filament-tribute-theme.svg?style=flat-square)](LICENSE.md)
+
+</div>
 
 > The filamentphp.com look, for your own panel.
 
@@ -14,11 +24,17 @@ buttons with the site's dark "flood" hover, flat underlined tabs and the
 Outfit + Albert Sans type pairing from the
 [Filament media kit](https://filamentphp.com/media-kit).
 
-![Filament Tribute Theme](art/banner.jpg)
+<div class="filament-hidden">
+
+![Filament Tribute Theme](https://raw.githubusercontent.com/La-boite-a-code/Filament-Tribute-Theme/main/art/banner.jpg)
+
+</div>
 
 | Light | Dark |
 | --- | --- |
-| ![The theme in light mode](art/screenshot-light.png) | ![The theme in dark mode](art/screenshot-dark.png) |
+| ![The theme in light mode](https://raw.githubusercontent.com/La-boite-a-code/Filament-Tribute-Theme/main/art/screenshot-light.png) | ![The theme in dark mode](https://raw.githubusercontent.com/La-boite-a-code/Filament-Tribute-Theme/main/art/screenshot-dark.png) |
+
+<div class="filament-hidden">
 
 ## Table of contents
 
@@ -35,6 +51,8 @@ Outfit + Albert Sans type pairing from the
 - [Testing](#testing)
 - [Credits](#credits)
 - [License](#license)
+
+</div>
 
 ## Why this theme
 
