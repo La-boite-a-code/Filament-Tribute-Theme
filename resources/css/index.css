@@ -1,2585 +1,532 @@
 /*
 |--------------------------------------------------------------------------
-| FilamentDesign — Filament v5 theme paying homage to Filament's own brand
+| Filament Tribute Theme — a Filament v5 theme paying homage to filamentphp.com
 |--------------------------------------------------------------------------
 |
-| Visual language (Filament media-kit brand):
-|   • Warm & cosy — Honey (#EFAF5D) primary on cream / off-white surfaces
-|   • Cocoa (#46341C) / Off-Black (#292524) anchor the dark end
-|   • Soft pastel accents: Powder blue, Minty green (selectable palettes)
-|   • Friendly, rounded geometry — a touch softer than the laravel.com homage
-|   • Solid 1px warm borders, gentle shadows, transitions ≤ 200ms
-|   • Outfit for display headings, Albert Sans for body
-|   • Subtle warm canvas wash so sections lift off the page
+| Built on Filament's own CSS architecture, which is why it stays small:
 |
-| All overrides live OUTSIDE @layer to win the cascade against
-| Filament's own component layer.
-*/
-
-/*
-| Outfit + Albert Sans (variable) — Filament's brand typefaces.
-| The @import for Google Fonts MUST live in the host's entry-point theme
-| stylesheet (Tailwind v4 / Vite require @import rules to come before any
-| other CSS). The published `theme.css` stub ships the import; the package
-| itself only declares the fonts in `--font-sans` / `--font-display` below.
+|   • Colours come from the panel. The plugin registers the brand palette
+|     through `$panel->colors()`, so every rule below reads the runtime
+|     variables Filament injects — `--primary-*`, `--gray-*`, `--success-*`…
+|     and `--color-*` / `--bg` inside a `.fi-color-*` scope. Nothing is
+|     remapped. Filament's contrast engine already picks honey-400 + dark
+|     ink for primary buttons; the theme only adds the pill and the hover.
+|   • Typography comes from the panel too: `->font('Albert Sans')` sets
+|     Filament's `--font-sans`. Only the Outfit display face is added.
+|   • Rules are written with Filament's Tailwind utilities via `@apply`
+|     and the `dark` / `hover` variants Filament defines, inside
+|     `@layer components` right after Filament's own component layer. The
+|     normal cascade applies, so every selector below mirrors the shape
+|     (and specificity) of the Filament rule it refines, and Filament keeps
+|     owning focus, invalid, disabled and responsive states.
+|
+| Signature material (filamentphp.com): warm off-white dotted canvas, cream
+| cards marked by two diagonal corner ticks, honey pill buttons with dark
+| ink and the dark "flood" hover, flat underlined tabs, tan hairlines,
+| Outfit headings on Stone ink.
 */
 
 /* ==========================================================================
-   1. DESIGN TOKENS
+   1. TOKENS
    ========================================================================== */
 
-@theme {
-    /* Palette HONEY — Filament signature (default).
-       Anchor #EFAF5D at 400; deepens toward Cocoa (#46341C) for UI shades. */
-    --color-honey-50:  oklch(0.982 0.014 82);
-    --color-honey-100: oklch(0.963 0.030 82);
-    --color-honey-200: oklch(0.928 0.058 80);
-    --color-honey-300: oklch(0.880 0.082 76);
-    --color-honey-400: oklch(0.798 0.124 71);
-    --color-honey-500: oklch(0.760 0.108 68);
-    --color-honey-600: oklch(0.670 0.110 62);
-    --color-honey-700: oklch(0.560 0.098 57);
-    --color-honey-800: oklch(0.460 0.076 53);
-    --color-honey-900: oklch(0.380 0.056 50);
-    --color-honey-950: oklch(0.265 0.040 48);
-
-    /* Palette POWDER — soft blue accent. Anchor #AEC6F4 at 300. */
-    --color-powder-50:  oklch(0.980 0.010 258);
-    --color-powder-100: oklch(0.958 0.022 258);
-    --color-powder-200: oklch(0.918 0.045 260);
-    --color-powder-300: oklch(0.858 0.070 262);
-    --color-powder-400: oklch(0.770 0.100 264);
-    --color-powder-500: oklch(0.670 0.130 264);
-    --color-powder-600: oklch(0.570 0.150 264);
-    --color-powder-700: oklch(0.480 0.145 265);
-    --color-powder-800: oklch(0.400 0.120 266);
-    --color-powder-900: oklch(0.330 0.090 267);
-    --color-powder-950: oklch(0.240 0.060 268);
-
-    /* Palette MINTY — soft green accent. Anchor #BFE6D9 at 300. */
-    --color-minty-50:  oklch(0.983 0.010 165);
-    --color-minty-100: oklch(0.962 0.022 165);
-    --color-minty-200: oklch(0.928 0.040 165);
-    --color-minty-300: oklch(0.888 0.055 166);
-    --color-minty-400: oklch(0.800 0.085 168);
-    --color-minty-500: oklch(0.700 0.110 170);
-    --color-minty-600: oklch(0.600 0.110 172);
-    --color-minty-700: oklch(0.505 0.098 173);
-    --color-minty-800: oklch(0.420 0.078 174);
-    --color-minty-900: oklch(0.345 0.058 175);
-    --color-minty-950: oklch(0.250 0.040 176);
-
-
-    /* Geometry — soft & friendly (Filament brand feel), a touch rounder
-       than the laravel.com homage */
-    --fd-radius-xs: 0.375rem;       /* 6px  — tiny chips, checkboxes */
-    --fd-radius-sm: 0.5rem;         /* 8px  — buttons, inputs, page items */
-    --fd-radius:    0.75rem;        /* 12px — sections, cards, callouts */
-    --fd-radius-lg: 1rem;           /* 16px — modals, dropdowns */
-    --fd-pill:      9999px;
-
-    /* Strokes — solid 1px partout (P1), warm-neutral en light/dark */
-    --fd-stroke: 1px;
-    --fd-border-soft-light: oklch(0.884 0.030 71);
-    --fd-border-soft-dark:  oklch(0.320 0.012 65);
-
-    /* Elevation — subtle / heavy (per visual direction §Ombres) */
-    --fd-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
-    --fd-shadow-lg: 0 12px 32px -8px rgb(0 0 0 / 0.10), 0 4px 12px -2px rgb(0 0 0 / 0.06);
-    /* Focus glow — see .fi-btn:focus-visible / .fi-input-wrp:focus-within for
-       inlined usage. Stored as a percentage instead of a full color-mix() so
-       `var(--fi-color-primary-500)` resolves at the consumer scope and follows
-       `.fd-palette-{powder,minty}`. */
-    --fd-glow-mix: 22%;
-
-    /* Canvas wash — Filament "Serenade" peachy cream (#FFF1E3) so the panel
-       reads like the marketing site, not a flat white admin. */
-    --fd-canvas: oklch(0.977 0.008 84);
-
-    /* Motion — keep ≤ 250ms (visual direction §Transitions) */
-    --fd-duration-slow: 200ms;
-    --fd-ease-out:      cubic-bezier(0.2, 0.8, 0.2, 1);
-
-    --font-sans: 'Albert Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+@theme static {
     --font-display: 'Outfit', 'Albert Sans', ui-sans-serif, system-ui, sans-serif;
-    --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+:root {
+    /* Canvas + card surfaces, matched to the site's computed values */
+    --tribute-canvas: #faf9f5;
+    --tribute-surface: oklch(0.932 0.029 72);
+    --tribute-line: oklch(0.884 0.03 71);
+
+    /* Two diagonal corner ticks (top-left + bottom-right), the site's card mark */
+    --tribute-corner-tl: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 11 11' fill='none'><path d='M9.5 0.5H0.5V9.5' stroke='%238c8274' stroke-linecap='round'/></svg>");
+    --tribute-corner-br: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 11 11' fill='none'><path d='M1.5 10.5H10.5V1.5' stroke='%238c8274' stroke-linecap='round'/></svg>");
+    --tribute-corners: var(--tribute-corner-tl), var(--tribute-corner-br);
+    --tribute-corner-pos: 7px 7px, calc(100% - 7px) calc(100% - 7px);
+
+    --tribute-radius: 2px;
+    --tribute-shadow-lg: 0 12px 32px -8px rgb(0 0 0 / 0.1), 0 4px 12px -2px rgb(0 0 0 / 0.06);
+    --tribute-ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.dark {
+    --tribute-canvas: var(--gray-950);
+    --tribute-surface: var(--gray-900);
+    --tribute-line: var(--gray-800);
+    --tribute-corner-tl: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 11 11' fill='none'><path d='M9.5 0.5H0.5V9.5' stroke='%23726a5e' stroke-linecap='round'/></svg>");
+    --tribute-corner-br: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 11 11' fill='none'><path d='M1.5 10.5H10.5V1.5' stroke='%23726a5e' stroke-linecap='round'/></svg>");
+    --tribute-shadow-lg: 0 12px 32px -8px rgb(0 0 0 / 0.5), 0 4px 12px -2px rgb(0 0 0 / 0.3);
+}
+
+/*
+| Reusable recipes. `@utility` makes them available as classes in your own
+| Blade views (`class="tribute-card"`) and via `@apply` below.
+*/
+@utility tribute-card {
+    background-color: var(--tribute-surface);
+    background-image: var(--tribute-corners);
+    background-position: var(--tribute-corner-pos);
+    background-repeat: no-repeat;
+    border-radius: var(--tribute-radius);
+    @apply shadow-none ring-0;
+}
+
+@utility tribute-display {
+    @apply font-display font-bold tracking-tight;
+}
+
+@utility tribute-eyebrow {
+    @apply font-display text-[0.6875rem] font-bold tracking-[0.12em] uppercase text-primary-600 dark:text-primary-400;
 }
 
 /* ==========================================================================
-   2. FILAMENT COLOR SCALE OVERRIDES
+   2. COMPONENTS
    ========================================================================== */
 
-:root {
-    --fi-color-primary-50:  var(--color-honey-50);
-    --fi-color-primary-100: var(--color-honey-100);
-    --fi-color-primary-200: var(--color-honey-200);
-    --fi-color-primary-300: var(--color-honey-300);
-    --fi-color-primary-400: var(--color-honey-400);
-    --fi-color-primary-500: var(--color-honey-500);
-    --fi-color-primary-600: var(--color-honey-600);
-    --fi-color-primary-700: var(--color-honey-700);
-    --fi-color-primary-800: var(--color-honey-800);
-    --fi-color-primary-900: var(--color-honey-900);
-    --fi-color-primary-950: var(--color-honey-950);
+@layer components {
+    /* ----- Canvas & shell ------------------------------------------------ */
 
-    --fi-color-gray-50:  oklch(0.990 0.003 75);
-    --fi-color-gray-100: oklch(0.974 0.004 75);
-    --fi-color-gray-200: oklch(0.937 0.005 75);
-    --fi-color-gray-300: oklch(0.882 0.006 75);
-    --fi-color-gray-400: oklch(0.730 0.007 75);
-    --fi-color-gray-500: oklch(0.580 0.008 75);
-    --fi-color-gray-600: oklch(0.460 0.008 75);
-    --fi-color-gray-700: oklch(0.355 0.007 75);
-    --fi-color-gray-800: oklch(0.255 0.006 75);
-    --fi-color-gray-900: oklch(0.165 0.005 75);
-    --fi-color-gray-950: oklch(0.082 0.004 75);
+    .fi-body {
+        background-color: var(--tribute-canvas);
+        background-image: radial-gradient(color-mix(in oklch, var(--gray-500) 20%, transparent) 1px, transparent 1.6px);
+        background-size: 22px 22px;
+
+        @variant dark {
+            background-image: radial-gradient(color-mix(in oklch, var(--gray-300) 9%, transparent) 1px, transparent 1.6px);
+        }
+    }
+
+    ::selection {
+        background-color: color-mix(in oklch, var(--primary-500) 30%, transparent);
+    }
+
+    .fi-topbar {
+        background-color: var(--tribute-canvas);
+        @apply border-b border-(--tribute-line) shadow-none ring-0;
+    }
+
+    .fi-sidebar {
+        background-color: var(--tribute-canvas);
+        @apply border-e border-(--tribute-line);
+    }
+
+    /* Global search: the site's quiet "Search… ⌘K" pill, results as a card */
+    .fi-global-search .fi-input-wrp {
+        background-color: var(--tribute-surface);
+        @apply rounded-full ring-(--tribute-line);
+    }
+
+    .fi-global-search-results-ctn {
+        @apply tribute-card;
+        box-shadow: var(--tribute-shadow-lg);
+    }
+
+    .fi-body-has-topbar .fi-sidebar-header {
+        background-color: var(--tribute-canvas);
+        @apply border-b border-(--tribute-line) ring-0 lg:shadow-none;
+    }
+
+    .fi-sidebar-nav {
+        @apply gap-y-6 px-4 py-6;
+    }
+
+    .fi-sidebar-nav-groups {
+        @apply gap-y-6;
+    }
+
+    .fi-sidebar-group-label {
+        @apply px-2 text-[0.6875rem] leading-5 font-bold tracking-[0.1em] uppercase;
+    }
+
+    .fi-sidebar-item-btn {
+        @apply rounded-md px-2.5;
+    }
+
+    .fi-sidebar-item.fi-sidebar-item-has-url:not(.fi-active) > .fi-sidebar-item-btn {
+        @variant hover {
+            background-color: color-mix(in oklch, var(--primary-500) 8%, transparent);
+        }
+    }
+
+    /* Active item: the site's corner brackets, dark ink, honey icon */
+    .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+        background-color: color-mix(in oklch, var(--primary-400) 10%, transparent);
+        background-image: var(--tribute-corners);
+        background-position: 5px 5px, calc(100% - 5px) calc(100% - 5px);
+        background-repeat: no-repeat;
+
+        & > .fi-icon {
+            @apply text-primary-500;
+        }
+
+        & > .fi-sidebar-item-label {
+            @apply font-semibold text-gray-950 dark:text-white;
+        }
+    }
+
+    /* Collapsed to icons on desktop: the tinted glyph is marker enough */
+    .fi-body-has-sidebar-collapsible-on-desktop .fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+        background: transparent;
+    }
+
+    /* ----- Page header --------------------------------------------------- */
+
+    .fi-header-heading {
+        @apply font-display text-3xl text-gray-800 sm:text-[2.125rem] dark:text-white;
+    }
+
+    .fi-header-subheading {
+        @apply text-base text-gray-500;
+    }
+
+    /* ----- Cards: sections, tabs blocks, dropdowns, modals, auth ---------- */
+
+    .fi-section:not(.fi-section-not-contained):not(.fi-aside),
+    .fi-section:not(.fi-section-not-contained).fi-aside > .fi-section-content-ctn {
+        @apply tribute-card;
+    }
+
+    .fi-section:not(.fi-section-not-contained):not(.fi-aside) {
+        &.fi-secondary {
+            background-color: color-mix(in oklch, var(--tribute-surface) 55%, var(--tribute-canvas));
+        }
+
+        &.fi-compact {
+            border-radius: var(--tribute-radius);
+        }
+
+        &.fi-section-has-header:not(.fi-collapsed) > .fi-section-content-ctn,
+        & > .fi-section-content-ctn > .fi-section-footer {
+            @apply border-(--tribute-line);
+        }
+    }
+
+    .fi-section .fi-section-header-heading {
+        @apply font-display text-gray-800 dark:text-white;
+    }
+
+    .fi-fieldset:not(.fi-fieldset-not-contained) {
+        @apply rounded-lg border-(--tribute-line);
+    }
+
+    .fi-sc-tabs.fi-contained {
+        @apply tribute-card;
+    }
+
+    /* Filament scopes the panel as `:scope .fi-dropdown-panel`; match it. */
+    :root .fi-dropdown-panel {
+        @apply tribute-card;
+        box-shadow: var(--tribute-shadow-lg);
+
+        &:not(.fi-dropdown-list) {
+            @apply divide-(--tribute-line);
+        }
+    }
+
+    .fi-modal > .fi-modal-window-ctn > .fi-modal-window {
+        @apply tribute-card;
+        box-shadow: var(--tribute-shadow-lg);
+
+        & .fi-modal-heading {
+            @apply font-display text-gray-800 dark:text-white;
+        }
+    }
+
+    .fi-modal:not(.fi-modal-slide-over):not(.fi-width-screen) > .fi-modal-window-ctn > .fi-modal-window {
+        border-radius: var(--tribute-radius);
+    }
+
+    .fi-modal.fi-modal-has-sticky-header > .fi-modal-window-ctn > .fi-modal-window > .fi-modal-header,
+    .fi-modal.fi-modal-has-sticky-footer > .fi-modal-window-ctn > .fi-modal-window > .fi-modal-footer {
+        background-color: var(--tribute-surface);
+        @apply border-(--tribute-line);
+    }
+
+    .fi-simple-main {
+        @apply tribute-card;
+    }
+
+    .fi-simple-header-heading {
+        @apply font-display text-gray-800 dark:text-white;
+    }
+
+    /* ----- Buttons ------------------------------------------------------- */
+
+    .fi-btn {
+        @apply rounded-full;
+
+        &.fi-size-md {
+            @apply px-5 py-2 text-base;
+        }
+
+        &.fi-size-lg {
+            @apply px-6 text-base;
+        }
+    }
 
     /*
-    | Filament v5 exposes semantic palettes (success / warning / danger / info)
-    | as bare `--{name}-{shade}` variables — no `--fi-color-` prefix. Alias them
-    | here so authored CSS can reference one consistent naming scheme
-    | (`--fi-color-success-500`) regardless of where the value originates.
+    | Primary: Filament already paints honey-400 with dark ink (its contrast
+    | engine rejects white on honey-600). Add the site's hover: a dark disc
+    | grows from the right edge and floods the pill while the label turns
+    | cream — inverted in dark mode (cream disc, dark label). The disc is a
+    | background layer whose size animates, so nothing needs
+    | `overflow: hidden` and action badges stay visible. The enabled-hover
+    | selector mirrors Filament's own so it wins over `hover:bg-(--hover-bg)`
+    | and `hover:text-(--hover-text)`.
     */
-    --fi-color-success-50:  var(--success-50);
-    --fi-color-success-100: var(--success-100);
-    --fi-color-success-200: var(--success-200);
-    --fi-color-success-300: var(--success-300);
-    --fi-color-success-400: var(--success-400);
-    --fi-color-success-500: var(--success-500);
-    --fi-color-success-600: var(--success-600);
-    --fi-color-success-700: var(--success-700);
-    --fi-color-success-800: var(--success-800);
-    --fi-color-success-900: var(--success-900);
-    --fi-color-success-950: var(--success-950);
+    .fi-btn.fi-color-primary:not(.fi-outlined):not(label) {
+        --tribute-flood: var(--gray-800);
+        @apply shadow-none ring-0;
+        background-image: radial-gradient(circle closest-side, var(--tribute-flood) 98%, transparent);
+        background-size: 0 0;
+        background-position: calc(100% - 1.25rem) 50%;
+        background-repeat: no-repeat;
+        transition: background-size 460ms var(--tribute-ease-out), color 300ms var(--tribute-ease-out);
 
-    --fi-color-warning-50:  var(--warning-50);
-    --fi-color-warning-100: var(--warning-100);
-    --fi-color-warning-200: var(--warning-200);
-    --fi-color-warning-300: var(--warning-300);
-    --fi-color-warning-400: var(--warning-400);
-    --fi-color-warning-500: var(--warning-500);
-    --fi-color-warning-600: var(--warning-600);
-    --fi-color-warning-700: var(--warning-700);
-    --fi-color-warning-800: var(--warning-800);
-    --fi-color-warning-900: var(--warning-900);
-    --fi-color-warning-950: var(--warning-950);
+        @variant dark {
+            --tribute-flood: var(--gray-50);
+        }
 
-    --fi-color-danger-50:  var(--danger-50);
-    --fi-color-danger-100: var(--danger-100);
-    --fi-color-danger-200: var(--danger-200);
-    --fi-color-danger-300: var(--danger-300);
-    --fi-color-danger-400: var(--danger-400);
-    --fi-color-danger-500: var(--danger-500);
-    --fi-color-danger-600: var(--danger-600);
-    --fi-color-danger-700: var(--danger-700);
-    --fi-color-danger-800: var(--danger-800);
-    --fi-color-danger-900: var(--danger-900);
-    --fi-color-danger-950: var(--danger-950);
+        &.fi-force-enabled,
+        &:not(.fi-disabled):not([disabled]) {
+            @variant hover {
+                background-color: var(--bg);
+                background-size: 80rem 80rem;
+                @apply text-gray-50;
 
-    --fi-color-info-50:  var(--info-50);
-    --fi-color-info-100: var(--info-100);
-    --fi-color-info-200: var(--info-200);
-    --fi-color-info-300: var(--info-300);
-    --fi-color-info-400: var(--info-400);
-    --fi-color-info-500: var(--info-500);
-    --fi-color-info-600: var(--info-600);
-    --fi-color-info-700: var(--info-700);
-    --fi-color-info-800: var(--info-800);
-    --fi-color-info-900: var(--info-900);
-    --fi-color-info-950: var(--info-950);
-}
+                @variant dark {
+                    background-color: var(--dark-bg);
+                    @apply text-gray-950;
+                }
 
-/* ==========================================================================
-   2b. PALETTE SWITCHERS
-   ==========================================================================
-|
-| Apply one of these classes to <body> (or the panel root) to swap the
-| Filament primary color from Honey (default) to Powder blue or Minty green.
-| Wired in via the FilamentDesignPlugin's panel hook.
-*/
-
-.fd-palette-powder {
-    --fi-color-primary-50:  var(--color-powder-50);
-    --fi-color-primary-100: var(--color-powder-100);
-    --fi-color-primary-200: var(--color-powder-200);
-    --fi-color-primary-300: var(--color-powder-300);
-    --fi-color-primary-400: var(--color-powder-400);
-    --fi-color-primary-500: var(--color-powder-500);
-    --fi-color-primary-600: var(--color-powder-600);
-    --fi-color-primary-700: var(--color-powder-700);
-    --fi-color-primary-800: var(--color-powder-800);
-    --fi-color-primary-900: var(--color-powder-900);
-    --fi-color-primary-950: var(--color-powder-950);
-}
-
-.fd-palette-minty {
-    --fi-color-primary-50:  var(--color-minty-50);
-    --fi-color-primary-100: var(--color-minty-100);
-    --fi-color-primary-200: var(--color-minty-200);
-    --fi-color-primary-300: var(--color-minty-300);
-    --fi-color-primary-400: var(--color-minty-400);
-    --fi-color-primary-500: var(--color-minty-500);
-    --fi-color-primary-600: var(--color-minty-600);
-    --fi-color-primary-700: var(--color-minty-700);
-    --fi-color-primary-800: var(--color-minty-800);
-    --fi-color-primary-900: var(--color-minty-900);
-    --fi-color-primary-950: var(--color-minty-950);
-}
-
-/* ==========================================================================
-   3. GLOBAL POLISH
-   ========================================================================== */
-
-body {
-    font-family: var(--font-sans);
-    font-feature-settings: 'cv11', 'ss01', 'ss03', 'salt';
-    letter-spacing: -0.005em;
-}
-
-::selection {
-    background-color: color-mix(in oklch, var(--fi-color-primary-500) 28%, transparent);
-    color: var(--fi-color-gray-900);
-}
-.dark ::selection { color: var(--fi-color-gray-50); }
-
-* {
-    scrollbar-width: thin;
-    scrollbar-color: var(--fi-color-gray-300) transparent;
-}
-.dark * { scrollbar-color: var(--fi-color-gray-700) transparent; }
-
-/* ==========================================================================
-   4. LAYOUT — peach gradient canvas, frosted topbar, refined sidebar
-   ========================================================================== */
-
-/*
-| Layout strategy:
-|   - The peach gradient lives on <body> so it spans the FULL viewport
-|     width (visible behind the topbar's translucent area and across
-|     the entire main canvas).
-|   - Sidebar + topbar stay near-white opaque to anchor navigation,
-|     but with a slight translucency at the very top of the topbar so
-|     the gradient bleeds through and ties the whole layout together.
-|   - .fi-main is transparent so the body gradient shows through.
-*/
-
-/*
-| Bg lives on .fi-body (= the body element with Filament's class) rather
-| than on `body` itself. Filament applies its own `.fi-body` rule that
-| would otherwise outspecify a bare `body { background }` selector and
-| force everything back to white.
-*/
-.fi-body {
-    background-color: var(--fd-canvas);
-    background-image:
-        radial-gradient(color-mix(in oklch, var(--fi-color-gray-500) 22%, transparent) 1px, transparent 1.6px),
-        radial-gradient(ellipse 90% 40% at 15% -10%, color-mix(in oklch, var(--fi-color-primary-500) 7%, transparent), transparent 55%),
-        radial-gradient(ellipse 70% 35% at 95% 8%, color-mix(in oklch, var(--fi-color-primary-500) 4%, transparent), transparent 60%),
-        radial-gradient(ellipse 80% 50% at 80% 95%, color-mix(in oklch, var(--fi-color-primary-500) 3%, transparent), transparent 65%);
-    background-size: 22px 22px, 100% 100%, 100% 100%, 100% 100%;
-    background-repeat: repeat, no-repeat, no-repeat, no-repeat;
-    background-attachment: fixed;
-    min-height: 100vh;
-}
-.dark {
-    --fd-canvas: var(--fi-color-gray-950);
-}
-.dark .fi-body {
-    background-color: var(--fd-canvas);
-    background-image:
-        radial-gradient(color-mix(in oklch, var(--fi-color-gray-300) 9%, transparent) 1px, transparent 1.6px),
-        radial-gradient(ellipse 90% 40% at 15% -10%, color-mix(in oklch, var(--fi-color-primary-500) 12%, transparent), transparent 55%),
-        radial-gradient(ellipse 70% 35% at 95% 8%, color-mix(in oklch, var(--fi-color-primary-500) 8%, transparent), transparent 60%),
-        radial-gradient(ellipse 80% 50% at 80% 95%, color-mix(in oklch, var(--fi-color-primary-500) 6%, transparent), transparent 65%);
-    background-size: 22px 22px, 100% 100%, 100% 100%, 100% 100%;
-    background-repeat: repeat, no-repeat, no-repeat, no-repeat;
-    background-attachment: fixed;
-}
-
-.fi-main {
-    background-color: transparent;
-    min-height: 100vh;
-}
-
-.fi-main-ctn { padding-block: 2rem; }
-
-.fi-topbar {
-    background-color: var(--fd-canvas);
-    border-bottom: 1px solid var(--fd-border-soft-light);
-    box-shadow: none;
-    --tw-ring-shadow: 0 0 #0000;
-    --tw-shadow: 0 0 #0000;
-    position: relative;
-}
-.fi-topbar > nav,
-.fi-topbar > div {
-    box-shadow: none;
-    --tw-ring-shadow: 0 0 #0000;
-    --tw-shadow: 0 0 #0000;
-}
-.dark .fi-topbar {
-    background-color: var(--fi-color-gray-900);
-    border-bottom-color: var(--fd-border-soft-dark);
-}
-
-/*
-| Sidebar: we let Filament's native layout handle positioning (sticky +
-| flex on desktop, off-canvas drawer on mobile). We only override the
-| visual skin — background, solid right border — so the structural
-| variables (--sidebar-width, collapse state, topbar offset) stay in
-| Filament's hands.
-*/
-
-.fi-sidebar {
-    background-color: var(--fd-canvas);
-    border-right: 1px solid var(--fd-border-soft-light);
-}
-.dark .fi-sidebar {
-    background-color: var(--fi-color-gray-900);
-    border-right-color: var(--fd-border-soft-dark);
-}
-
-.fi-sidebar-header {
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--fd-border-soft-light);
-    background-color: var(--fd-canvas);
-}
-.dark .fi-sidebar-header {
-    background-color: var(--fi-color-gray-900);
-    border-bottom-color: var(--fd-border-soft-dark);
-}
-
-.fi-sidebar-nav {
-    padding-block: 0.75rem;
-    gap: 0;
-}
-
-.fi-sidebar-nav-groups {
-    gap: 0;
-}
-
-.fi-sidebar-group {
-    padding-block: 0.375rem;
-}
-
-.fi-sidebar-group + .fi-sidebar-group {
-    border-top: 1px solid var(--fd-border-soft-light);
-    margin-top: 0.375rem;
-    padding-top: 0.625rem;
-}
-.dark .fi-sidebar-group + .fi-sidebar-group {
-    border-top-color: var(--fd-border-soft-dark);
-}
-
-.fi-sidebar-group-label {
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--fi-color-gray-500);
-    padding-inline: 0.75rem;
-    margin-bottom: 0.25rem;
-}
-
-.fi-sidebar-group-items {
-    gap: 0.1875rem;
-}
-
-.fi-sidebar-item .fi-sidebar-item-btn {
-    border-radius: var(--fd-radius-sm);
-    margin-inline: 0.375rem;
-    padding-block: 0.5rem;
-    padding-inline: 0.625rem;
-    font-weight: 500;
-    font-size: 0.875rem;
-    gap: 0.625rem;
-    transition: background-color 120ms ease, color 120ms ease;
-}
-
-.fi-sidebar-item .fi-sidebar-item-icon {
-    width: 1.125rem;
-    height: 1.125rem;
-}
-
-.fi-sidebar-item:not(.fi-active) .fi-sidebar-item-btn:hover {
-    background-color: color-mix(in oklch, var(--fi-color-primary-500) 7%, transparent);
-    color: var(--fi-color-gray-900);
-}
-.dark .fi-sidebar-item:not(.fi-active) .fi-sidebar-item-btn:hover {
-    background-color: color-mix(in oklch, var(--fi-color-primary-500) 12%, transparent);
-    color: var(--fi-color-gray-50);
-}
-
-/* Active — corner brackets like the site's active navbar item (⌐ ¬), dark
-   bold ink, a whisper of honey wash for sidebar legibility. Tighter corner
-   inset since menu rows are short. */
-.fi-sidebar-item.fi-active .fi-sidebar-item-btn {
-    background-color: color-mix(in oklch, var(--fi-color-primary-400) 9%, transparent);
-    background-image: var(--fd-corners);
-    background-position: 5px 5px, calc(100% - 5px) calc(100% - 5px);
-    background-repeat: no-repeat;
-    color: var(--fi-color-gray-900);
-    font-weight: 600;
-    box-shadow: none;
-}
-.dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
-    color: var(--fi-color-gray-50);
-    background-color: color-mix(in oklch, var(--fi-color-primary-400) 12%, transparent);
-}
-.fi-sidebar-item.fi-active .fi-sidebar-item-icon {
-    color: var(--fi-color-primary-500);
-}
-/* Filament applies text-primary-700 directly on the label span; override it
-   so the active label is dark cocoa ink (honey stays on the icon + brackets). */
-.fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-label {
-    color: var(--fi-color-gray-900);
-}
-.dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-label {
-    color: var(--fi-color-gray-50);
-}
-
-.fi-sidebar-item .fi-sidebar-item-btn {
-    position: relative;
-}
-
-/* When the sidebar is collapsed to icons, the active "bubble" (gradient,
-   inset ring, edge dot) reads as a heavy frame around a single glyph and
-   adds no information — the tinted icon already marks the current page.
-   Strip the chrome and keep only the icon colour. */
-.fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
-    background: transparent;
-    box-shadow: none;
-}
-.dark .fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
-    background: transparent;
-}
-.fi-sidebar:not(.fi-sidebar-open) .fi-sidebar-item.fi-active .fi-sidebar-item-btn::after {
-    display: none;
-}
-
-/* When the active item carries a badge, promote the badge itself to the
-   active marker — solid primary fill so it reads as "current page" without
-   needing a separate dot. */
-.fi-sidebar-item.fi-active .fi-sidebar-item-badge-ctn .fi-badge {
-    background-color: var(--fi-color-primary-400);
-    color: var(--fi-color-primary-950);
-    border-color: transparent;
-    box-shadow: 0 1px 2px 0 color-mix(in oklch, var(--fi-color-primary-700) 22%, transparent);
-}
-.dark .fi-sidebar-item.fi-active .fi-sidebar-item-badge-ctn .fi-badge {
-    background-color: var(--fi-color-primary-400);
-    color: var(--fi-color-gray-950);
-}
-.fi-sidebar-item.fi-active .fi-sidebar-item-badge-ctn .fi-badge .fi-badge-label {
-    color: inherit;
-}
-
-/* ==========================================================================
-   5. SECTIONS / CARDS — soft-rounded, solid 1px borders (P1)
-   ========================================================================== */
-
-/*
-| Sections — laravel.com / cloud.laravel.com style :
-|   - Surface plate, ombre quasi nulle (uniquement une hairline 1px)
-|   - Pas d'eyebrow rouge qui apparaît au hover (gimmicky)
-|   - Padding généreux (P3 espacement)
-|   - Description tightement collée au heading
-*/
-
-/*
-| Double-frame surface — inner solid border + outer hairline ring
-| separated by a canvas-coloured gap. Both border colours are neutral
-| grays (no palette tint) so the chrome stays calm in both light and
-| dark mode and doesn't fight with the active brand palette.
-|
-| Tokens:
-|   --fd-frame-gap        gap between inner border and outer ring
-|   --fd-frame-gap-color  fill colour painted in that gap (canvas)
-|   --fd-frame-ring-color outer hairline colour
-*/
-:root {
-    /* Card surface + corner-bracket marks — filamentphp.com's signature look:
-       cream cards with tiny L-shaped corner ticks instead of a full border. */
-    --fd-surface: oklch(0.932 0.029 72);
-    --fd-corner-tl: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 11 11' fill='none'><path d='M9.5 0.5H0.5V9.5' stroke='%238c8274' stroke-linecap='round'/></svg>");
-    --fd-corner-tr: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 11 11' fill='none'><path d='M1.5 0.5H10.5V9.5' stroke='%238c8274' stroke-linecap='round'/></svg>");
-    --fd-corner-bl: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 11 11' fill='none'><path d='M9.5 10.5H0.5V1.5' stroke='%238c8274' stroke-linecap='round'/></svg>");
-    --fd-corner-br: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 11 11' fill='none'><path d='M1.5 10.5H10.5V1.5' stroke='%238c8274' stroke-linecap='round'/></svg>");
-    /* The site marks cards with just two diagonal corner ticks (top-left +
-       bottom-right), not all four. */
-    --fd-corners: var(--fd-corner-tl), var(--fd-corner-br);
-    --fd-corner-pos: 7px 7px, calc(100% - 7px) calc(100% - 7px);
-}
-.dark {
-    --fd-surface: var(--fi-color-gray-900);
-    --fd-corner-tl: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 11 11' fill='none'><path d='M9.5 0.5H0.5V9.5' stroke='%23726a5e' stroke-linecap='round'/></svg>");
-    --fd-corner-tr: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 11 11' fill='none'><path d='M1.5 0.5H10.5V9.5' stroke='%23726a5e' stroke-linecap='round'/></svg>");
-    --fd-corner-bl: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 11 11' fill='none'><path d='M9.5 10.5H0.5V1.5' stroke='%23726a5e' stroke-linecap='round'/></svg>");
-    --fd-corner-br: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 11 11' fill='none'><path d='M1.5 10.5H10.5V1.5' stroke='%23726a5e' stroke-linecap='round'/></svg>");
-}
-
-.fi-section {
-    background-color: var(--fd-surface);
-    background-image: var(--fd-corners);
-    background-position: var(--fd-corner-pos);
-    background-repeat: no-repeat;
-    border: none;
-    border-radius: 2px;
-    box-shadow: none;
-    --tw-ring-shadow: 0 0 #0000;
-    --tw-shadow: 0 0 #0000;
-}
-.dark .fi-section {
-    background-color: var(--fi-color-gray-900);
-}
-/* "Not contained" sections are layout groupings, not cards — no cream fill or
-   brackets, so their children (e.g. stat widgets) become the actual cards. */
-.fi-section.fi-section-not-contained {
-    background-color: transparent;
-    background-image: none;
-    border: none;
-}
-
-/* Nested sections (Section → Section, Repeater items, etc.) — opt the
-   inner ones out of the outer ring so we don't stack three borders deep. */
-.fi-section .fi-section,
-.fi-section .fi-ta,
-.fi-fo-fieldset .fi-section,
-.fi-fo-repeater-item .fi-section {
-    box-shadow: none;
-}
-
-/*
-| Section header — Forge-style separation: same background as the
-| section body, but a clean solid divider with generous breathing room
-| above and below. The divider is the same hairline used on the section
-| border, so the header reads as a chapter heading rather than a tinted
-| lid. Padding is asymmetric on purpose: a touch more space below the
-| divider than above so the heading sits closer to the divider, the
-| content sits further from it.
-*/
-.fi-section-header {
-    padding: 1.25rem 1.5rem 1.125rem;
-    border-bottom: var(--fd-stroke) solid var(--fd-border-soft-light);
-}
-.dark .fi-section-header {
-    border-bottom-color: var(--fi-color-gray-800);
-}
-
-.fi-section-header-heading {
-    font-family: var(--font-display);
-    font-size: 0.9375rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    color: var(--fi-color-gray-900);
-    line-height: 1.35;
-}
-.dark .fi-section-header-heading {
-    color: var(--fi-color-gray-50);
-}
-
-.fi-section-header-description {
-    font-size: 0.8125rem;
-    color: var(--fi-color-gray-500);
-    margin-top: 0.25rem;
-    line-height: 1.5;
-}
-
-.fi-section-content { padding: 1.5rem 1.5rem 1.625rem; }
-
-.fi-section-content-ctn:not(.fi-section-has-content-padding) > .fi-section-content {
-    padding: 1.5rem 1.5rem 1.625rem;
-}
-
-/* Stack sections with consistent breathing room. The grid/flex of the
-   page already lays them out, but when they sit edge-to-edge in a column
-   we want a clean gap rather than touching pip rectangles. */
-.fi-section + .fi-section,
-.fi-sc-section + .fi-sc-section {
-    margin-top: 1.25rem;
-}
-
-.fi-section-footer {
-    padding: 0.875rem 1.5rem;
-    border-top: var(--fd-stroke) solid var(--fd-border-soft-light);
-    background-color: var(--fi-color-gray-50);
-    border-radius: 0 0 calc(var(--fd-radius) - 1px) calc(var(--fd-radius) - 1px);
-}
-.dark .fi-section-footer {
-    border-top-color: var(--fd-border-soft-dark);
-    background-color: var(--fi-color-gray-950);
-}
-
-/* ==========================================================================
-   7. PAGE HEADER — bold display + breadcrumbs polish
-   ========================================================================== */
-
-.fi-header {
-    margin-bottom: 1.625rem;
-}
-
-.fi-header-heading {
-    font-family: var(--font-display);
-    font-size: 2.125rem;
-    font-weight: 700;
-    letter-spacing: -0.005em;
-    color: oklch(0.28 0.035 52);
-    line-height: 1.1;
-    text-wrap: balance;
-    position: relative;
-    display: inline-block;
-}
-.dark .fi-header-heading {
-    color: var(--fi-color-gray-50);
-}
-
-.fi-header-subheading {
-    color: var(--fi-color-gray-500);
-    font-size: 0.9375rem;
-    margin-top: 0.4375rem;
-    line-height: 1.5;
-    max-width: 56ch;
-}
-
-.fi-breadcrumbs {
-    margin-bottom: 0.625rem;
-}
-
-.fi-breadcrumbs-item {
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: var(--fi-color-gray-500);
-    transition: color 120ms var(--fd-ease-out);
-}
-.fi-breadcrumbs-item:hover {
-    color: var(--fi-color-gray-900);
-}
-.dark .fi-breadcrumbs-item:hover {
-    color: var(--fi-color-gray-100);
-}
-.fi-breadcrumbs-item-separator {
-    color: var(--fi-color-gray-300);
-}
-.dark .fi-breadcrumbs-item-separator {
-    color: var(--fi-color-gray-700);
-}
-
-/* ==========================================================================
-   8. BUTTONS
-   ========================================================================== */
-
-.fi-btn {
-    border-radius: var(--fd-pill);
-    font-weight: 500;
-    font-size: 0.9375rem;
-    padding-inline: 1.25rem;
-    letter-spacing: 0;
-    transition: transform 120ms ease, background-color 140ms ease,
-                box-shadow 180ms ease, color 140ms ease, border-color 140ms ease;
-}
-.fi-btn:active { transform: translateY(0.5px); }
-.fi-btn:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--fi-color-primary-500) var(--fd-glow-mix), transparent);
-}
-
-/* Primary — filamentphp.com signature CTA: honey PILL with dark neutral ink
-   (not white text). On hover a dark circle scales up from the right edge and
-   floods the pill (clipped by overflow:hidden) while the label flips to a warm
-   cream — the exact "fill" interaction from the site, minus the arrow badge. */
-.fi-btn.fi-color-primary {
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-    background-color: var(--fi-color-primary-400);
-    background-image: none;
-    color: oklch(0.216 0.006 56);
-    border: none;
-    box-shadow: none;
-    transition: color 300ms var(--fd-ease-out), transform 120ms ease;
-}
-.fi-btn.fi-color-primary::before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    top: 50%;
-    right: 0.25rem;
-    width: 2.5rem;
-    aspect-ratio: 1;
-    border-radius: var(--fd-pill);
-    background-color: oklch(0.216 0.006 56);
-    transform: translate(50%, -50%) scale(0);
-    transition: transform 460ms var(--fd-ease-out);
-}
-.fi-btn.fi-color-primary:hover {
-    color: oklch(0.965 0.024 72);
-    background-color: var(--fi-color-primary-400);
-    box-shadow: none;
-}
-.fi-btn.fi-color-primary:hover::before {
-    transform: translate(50%, -50%) scale(16);
-}
-.fi-btn.fi-color-primary:active::before {
-    background-color: oklch(0.16 0.006 56);
-}
-/* Honour reduced-motion: skip the sweep, cross-fade to the dark fill. */
-@media (prefers-reduced-motion: reduce) {
-    .fi-btn.fi-color-primary::before {
-        transition: opacity 160ms linear;
-        transform: translate(50%, -50%) scale(16);
-        opacity: 0;
+                & > .fi-icon {
+                    @apply text-gray-50 dark:text-gray-950;
+                }
+            }
+        }
     }
-    .fi-btn.fi-color-primary:hover::before {
-        opacity: 1;
+
+    /* Gray / default buttons: cream ghost pill on the tan hairline */
+    .fi-btn:not(.fi-color):not(.fi-outlined):not(label) {
+        background-color: var(--tribute-surface);
+        @apply shadow-none ring-(--tribute-line);
+
+        @variant dark {
+            @apply bg-white/5 ring-white/20;
+        }
+
+        &.fi-force-enabled,
+        &:not(.fi-disabled):not([disabled]) {
+            @variant hover {
+                background-color: color-mix(in oklch, var(--primary-400) 14%, var(--tribute-surface));
+
+                @variant dark {
+                    @apply bg-white/10;
+                }
+            }
+        }
     }
-}
-
-/* Danger — quiet by default (soft red border), filled red on hover. P1 = solid. */
-.fi-btn.fi-color-danger:not(.fi-outlined) {
-    background-color: transparent;
-    color: var(--fi-color-danger-600);
-    border: 1px solid color-mix(in oklch, var(--fi-color-danger-500) 35%, transparent);
-    box-shadow: none;
-}
-.fi-btn.fi-color-danger:not(.fi-outlined):hover {
-    background-color: color-mix(in oklch, var(--fi-color-danger-500) 8%, transparent);
-    border-color: var(--fi-color-danger-500);
-    color: var(--fi-color-danger-700);
-    box-shadow: 0 1px 2px 0 color-mix(in oklch, var(--fi-color-danger-700) 18%, transparent);
-}
-.dark .fi-btn.fi-color-danger:not(.fi-outlined) {
-    color: var(--fi-color-danger-400);
-}
-.dark .fi-btn.fi-color-danger:not(.fi-outlined):hover {
-    color: var(--fi-color-danger-300);
-}
-
-.fi-btn.fi-outlined {
-    background-color: var(--fd-surface);
-    border: 1px solid var(--fd-border-soft-light);
-    color: var(--fi-color-gray-800);
-    box-shadow: none;
-}
-.fi-btn.fi-outlined:hover {
-    background-color: color-mix(in oklch, var(--fi-color-primary-400) 12%, var(--fd-surface));
-    border-color: color-mix(in oklch, var(--fi-color-primary-500) 30%, var(--fd-border-soft-light));
-    color: var(--fi-color-gray-900);
-}
-
-/* Default (no-colour) secondary buttons are gray-non-outlined and ship white
-   from Filament; give them the same cream ghost pill so they don't read as
-   bright white blobs on the cream cards. */
-.fi-btn.fi-color-gray:not(.fi-outlined):not(.fi-link) {
-    background-color: var(--fd-surface);
-    border: 1px solid var(--fd-border-soft-light);
-    color: var(--fi-color-gray-800);
-    box-shadow: none;
-}
-.fi-btn.fi-color-gray:not(.fi-outlined):not(.fi-link):hover {
-    background-color: color-mix(in oklch, var(--fi-color-primary-400) 12%, var(--fd-surface));
-    border-color: color-mix(in oklch, var(--fi-color-primary-500) 30%, var(--fd-border-soft-light));
-    color: var(--fi-color-gray-900);
-}
-.dark .fi-btn.fi-color-gray:not(.fi-outlined):not(.fi-link) {
-    background-color: var(--fi-color-gray-900);
-    border-color: var(--fi-color-gray-700);
-    color: var(--fi-color-gray-100);
-}
-.dark .fi-btn.fi-outlined {
-    background-color: var(--fi-color-gray-900);
-    border-color: var(--fi-color-gray-700);
-    color: var(--fi-color-gray-100);
-}
-.dark .fi-btn.fi-outlined:hover {
-    background-color: color-mix(in oklch, var(--fi-color-gray-800) 60%, var(--fi-color-gray-900));
-    border-color: var(--fi-color-gray-600);
-    color: white;
-}
-
-.fi-btn.fi-size-xs,
-.fi-btn.fi-size-sm {
-    border-radius: var(--fd-pill);
-}
-/* Default (md) buttons — the header CTAs — match the site's chunkier 16px
-   pill. Smaller table/action buttons keep the base 15px so dense UIs stay
-   compact. */
-.fi-btn.fi-size-md {
-    font-size: 1rem;
-    padding-block: 0.5rem;
-}
-
-.fi-icon-btn {
-    border-radius: var(--fd-radius-sm);
-    transition: background-color 120ms ease, color 120ms ease;
-}
-.fi-icon-btn:hover {
-    background-color: var(--fi-color-gray-100);
-    color: var(--fi-color-primary-600);
-}
-.dark .fi-icon-btn:hover {
-    background-color: var(--fi-color-gray-800);
-    color: var(--fi-color-primary-300);
-}
-
-/* Table toolbar controls (filter + column toggle) read as cream ghost pills,
-   like the site's "Filters" button, rather than bare icons. */
-.fi-ta-header-toolbar .fi-icon-btn,
-.fi-ta-filters-trigger-action-ctn .fi-icon-btn {
-    background-color: var(--fd-surface);
-    border: 1px solid var(--fd-border-soft-light);
-}
-.fi-ta-header-toolbar .fi-icon-btn:hover,
-.fi-ta-filters-trigger-action-ctn .fi-icon-btn:hover {
-    background-color: color-mix(in oklch, var(--fi-color-primary-400) 12%, var(--fd-surface));
-    border-color: color-mix(in oklch, var(--fi-color-primary-500) 30%, var(--fd-border-soft-light));
-    color: var(--fi-color-gray-900);
-}
-.dark .fi-ta-header-toolbar .fi-icon-btn,
-.dark .fi-ta-filters-trigger-action-ctn .fi-icon-btn {
-    background-color: var(--fi-color-gray-900);
-    border-color: var(--fi-color-gray-700);
-}
-
-/* ==========================================================================
-   9. INPUTS / FORMS — eyebrow labels, bordered fieldsets, red required mark
-   ========================================================================== */
-
-.fi-input,
-.fi-fo-text-input,
-.fi-fo-textarea,
-.fi-input-wrp {
-    border-radius: var(--fd-radius-sm);
-}
-
-.fi-input-wrp {
-    background-color: white;
-    border: 1px solid var(--fi-color-gray-300);
-    box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.02);
-    transition: border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
-}
-.dark .fi-input-wrp {
-    background-color: var(--fi-color-gray-900);
-    border-color: var(--fi-color-gray-700);
-    box-shadow: none;
-}
-
-.fi-input-wrp:hover {
-    border-color: var(--fi-color-gray-400);
-}
-.dark .fi-input-wrp:hover {
-    border-color: var(--fi-color-gray-600);
-}
-
-.fi-input-wrp:focus-within {
-    border-color: var(--fi-color-primary-500);
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--fi-color-primary-500) var(--fd-glow-mix), transparent);
-    background-color: white;
-}
-.dark .fi-input-wrp:focus-within {
-    background-color: var(--fi-color-gray-900);
-}
-
-/* Only the inner <input>/<textarea> is transparent — the wrapper keeps its
-   white fill so text fields stay white on the cream cards (not beige). */
-.fi-input {
-    background-color: transparent;
-    font-size: 0.9375rem;
-    line-height: 1.5;
-    font-family: var(--font-sans);
-    color: var(--fi-color-gray-900);
-}
-.dark .fi-input,
-.dark .fi-fo-text-input,
-.dark .fi-fo-textarea {
-    color: var(--fi-color-gray-50);
-}
-
-.fi-input::placeholder,
-.fi-fo-text-input::placeholder,
-.fi-fo-textarea::placeholder {
-    color: var(--fi-color-gray-400);
-}
-.dark .fi-input::placeholder,
-.dark .fi-fo-text-input::placeholder,
-.dark .fi-fo-textarea::placeholder {
-    color: var(--fi-color-gray-500);
-}
-
-/*
-| Field labels — sentence case medium, aligné laravel.com / id.laravel.com.
-| On retire le uppercase eyebrow (trop tech-doc) au profit d'un label
-| discret et lisible : weight 500, size 14px, sans tracking.
-|
-| Spacing between label and input: handled by the parent .fi-fo-field
-| grid `gap` (8px). We deliberately do NOT add `margin-bottom` here —
-| .fi-input-wrp-label is also used for INLINE prefix labels (e.g. the
-| "Per page" label inside the pagination select), where a margin-bottom
-| would push the wrapper taller than its siblings and break vertical
-| centring in the pagination row.
-*/
-.fi-fo-field-label,
-.fi-input-wrp-label {
-    font-weight: 500;
-    font-size: 0.875rem;
-    letter-spacing: 0;
-    text-transform: none;
-    color: var(--fi-color-gray-800);
-    line-height: 1.4;
-}
-.dark .fi-fo-field-label,
-.dark .fi-input-wrp-label {
-    color: var(--fi-color-gray-200);
-}
-
-/*
-| Required mark — small primary-tinted dot, vertically aligned with the
-| optical centre of the label glyphs. `vertical-align: middle` aligns
-| the dot's box centre with the parent x-height middle, which for our
-| label font sits above cap-centre. We nudge down to land mid-cap.
-*/
-.fi-fo-field-label-required-mark {
-    display: inline-block;
-    inline-size: 0.375rem;
-    block-size: 0.375rem;
-    background-color: var(--fi-color-primary-500);
-    color: transparent;
-    border-radius: 9999px;
-    margin-inline-start: 0.4375rem;
-    overflow: hidden;
-    vertical-align: middle;
-    transform: translateY(2px);
-}
-
-/* Helper / hint text — subtle, with breathing room from the input */
-.fi-fo-field-wrp-hint,
-.fi-fo-field-wrp-helper-text {
-    font-size: 0.8125rem;
-    color: var(--fi-color-gray-500);
-    margin-top: 0.4375rem;
-    line-height: 1.5;
-}
-.dark .fi-fo-field-wrp-hint,
-.dark .fi-fo-field-wrp-helper-text {
-    color: var(--fi-color-gray-400);
-}
-
-/* Error — same spacing rhythm as helpers */
-.fi-fo-field-wrp-error-message,
-.fi-fo-field-wrp-error-list {
-    color: var(--fi-color-danger-600);
-    font-weight: 500;
-    font-size: 0.8125rem;
-    margin-top: 0.4375rem;
-    line-height: 1.5;
-}
-.dark .fi-fo-field-wrp-error-message,
-.dark .fi-fo-field-wrp-error-list {
-    color: var(--fi-color-danger-400);
-}
-
-/* Section-content inside a form — consistent row gap between fields */
-.fi-section-content .fi-fo-component-ctn {
-    gap: 1.25rem;
-}
-
-.fi-toggle.fi-on { background-color: var(--fi-color-primary-500); }
-
-.fi-checkbox-input:checked,
-.fi-radio-input:checked {
-    background-color: var(--fi-color-primary-500);
-    border-color: var(--fi-color-primary-500);
-}
-
-.fi-checkbox-input,
-.fi-radio-input {
-    border-radius: var(--fd-radius-xs);
-    border-color: var(--fi-color-gray-300);
-}
-.fi-radio-input { border-radius: 9999px; }
-
-/* Fieldset — soft solid border, labeled */
-.fi-fo-fieldset,
-.fi-sc-fieldset {
-    background-color: white;
-    border: var(--fd-stroke) solid var(--fd-border-soft-light);
-    border-radius: var(--fd-radius);
-    padding: 1.25rem 1.5rem;
-}
-.dark .fi-fo-fieldset,
-.dark .fi-sc-fieldset {
-    background-color: var(--fi-color-gray-900);
-    border-color: var(--fd-border-soft-dark);
-}
-
-.fi-fieldset-label,
-.fi-sc-fieldset-label {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0;
-    text-transform: none;
-    color: var(--fi-color-primary-600);
-    background-color: white;
-    padding-inline: 0.5rem;
-    margin-inline-start: -0.5rem;
-}
-.dark .fi-fieldset-label,
-.dark .fi-sc-fieldset-label {
-    color: var(--fi-color-primary-400);
-    background-color: var(--fi-color-gray-900);
-}
-
-/*
-| Toggle buttons — one radio per option rendered as a .fi-btn label.
-| Filament's base rule (from its dist) paints the :checked state in a
-| washed-out Tailwind gray-400 which reads as near-white in dark mode.
-| We replace that with a brand-forward selection: primary-tinted bg,
-| primary-colored text and a thin primary ring — consistent in both
-| light and dark, and aligned with the rest of the theme.
-*/
-.fi-fo-toggle-buttons-input:checked + .fi-btn:not(.fi-outlined),
-.fi-fo-toggle-buttons-input:checked + .fi-btn:not(.fi-outlined):hover {
-    background-color: color-mix(in oklch, var(--fi-color-primary-500) 12%, white);
-    background-image: none;
-    color: var(--fi-color-primary-700);
-    border-color: var(--fi-color-primary-500);
-    box-shadow:
-        inset 0 0 0 1px var(--fi-color-primary-500),
-        0 1px 2px 0 color-mix(in oklch, var(--fi-color-primary-700) 15%, transparent);
-}
-.dark .fi-fo-toggle-buttons-input:checked + .fi-btn:not(.fi-outlined),
-.dark .fi-fo-toggle-buttons-input:checked + .fi-btn:not(.fi-outlined):hover {
-    background-color: color-mix(in oklch, var(--fi-color-primary-500) 20%, var(--fi-color-gray-900));
-    color: var(--fi-color-primary-200);
-    border-color: var(--fi-color-primary-500);
-    box-shadow:
-        inset 0 0 0 1px var(--fi-color-primary-500),
-        0 1px 2px 0 rgba(0, 0, 0, 0.3);
-}
-.fi-fo-toggle-buttons-input:checked + .fi-btn:not(.fi-outlined) .fi-btn-icon,
-.fi-fo-toggle-buttons-input:checked + .fi-btn:not(.fi-outlined) .fi-icon {
-    color: var(--fi-color-primary-600);
-}
-.dark .fi-fo-toggle-buttons-input:checked + .fi-btn:not(.fi-outlined) .fi-btn-icon,
-.dark .fi-fo-toggle-buttons-input:checked + .fi-btn:not(.fi-outlined) .fi-icon {
-    color: var(--fi-color-primary-300);
-}
-
-/* ==========================================================================
-   10. TABLES — controls outside the bordered area, table reads cleanly
-   ========================================================================== */
-
-/*
-| Strategy: only the data grid lives inside the bordered rectangle.
-| Search, filters, column manager and pagination float outside on a
-| transparent background — they sit on the page canvas, not on the table.
-| This is achieved by: making .fi-ta-ctn transparent (no bg/border) and
-| putting the visual frame on the actual table element instead.
-*/
-
-.fi-ta-ctn {
-    background-color: transparent;
-    border: none;
-    box-shadow: none;
-    border-radius: 0;
-    overflow: visible;
-    padding: 0;
-}
-
-/* The data grid itself — that's where the bordered frame lives.
-   Same Forge-style double frame as .fi-section: hairline border +
-   palette-tinted outer ring with a canvas-coloured gap. */
-.fi-ta {
-    background-color: var(--fd-surface);
-    background-image: var(--fd-corners);
-    background-position: var(--fd-corner-pos);
-    background-repeat: no-repeat;
-    border: none;
-    border-radius: 2px;
-    box-shadow: none;
-    --tw-ring-shadow: 0 0 #0000;
-    --tw-shadow: 0 0 #0000;
-    position: relative;
-}
-.dark .fi-ta {
-    background-color: var(--fi-color-gray-900);
-    border-color: var(--fd-border-soft-dark);
-}
-
-/* Header (search bar, column manager, etc.) sits above the table.
-   Horizontal padding aligns the select-all checkbox with the row
-   checkboxes below it (rows have a 24px content-prefix gutter). */
-.fi-ta-content-header {
-    background-color: transparent;
-    border: none;
-    padding: 0.75rem 1.5rem 0.875rem;
-    margin-bottom: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-.dark .fi-ta-content-header {
-    background-color: transparent;
-}
-
-/*
-| Filter trigger (the funnel icon) — Filament puts it inside its own
-| above-content container that renders BEFORE the toolbar with the
-| search bar. Visually that leaves the funnel floating up-top while
-| search sits 28-40px below. We promote the trigger to absolute
-| positioning so it lands at search-bar height in the top-right of the
-| header. The collapsible filter panel itself stays in normal flow.
-*/
-.fi-ta-header-ctn {
-    position: relative;
-}
-
-.fi-ta-filters-above-content-ctn {
-    background-color: transparent;
-    border: none;
-    padding: 0;
-    margin-block: 0;
-}
-
-.fi-ta-filters-above-content-ctn > .fi-ta-filters-trigger-action-ctn {
-    position: absolute;
-    top: 1.25rem;
-    inset-inline-end: 1rem;
-    margin: 0;
-    z-index: 5;
-}
-
-/* When the inline filter trigger is present, reserve space at the
-   end of the toolbar so the column-manager button doesn't sit under
-   the absolutely-positioned funnel. 36px (button) + 16px (right inset)
-   + 8px (gap) = 60px of padding pushed onto whatever sibling toolbar
-   renders below the filter container. */
-.fi-ta-header-ctn:has(> .fi-ta-filters-above-content-ctn .fi-ta-filters-trigger-action-ctn) .fi-ta-header-toolbar {
-    padding-inline-end: calc(1.5rem + 36px + 0.5rem);
-}
-
-/* Same idea for the filter panel's own header row when open: the
-   "Reset" link sits at the right edge of the panel and otherwise
-   collides with the absolute funnel trigger overlay. Push the
-   header's content inset so the link clears the trigger's footprint. */
-.fi-ta-filters-above-content-ctn.fi-open .fi-ta-filters-header {
-    padding-inline-end: calc(36px + 0.5rem);
-}
-
-/* Dropdown-variant filter trigger: in v5 the badge wrapper is only
-   emitted when at least one filter is active, so any wrapper that
-   somehow renders without a `.fi-badge` child is the stray empty
-   case and should be hidden. */
-.fi-ta-filters-dropdown .fi-icon-btn-badge-ctn:not(:has(.fi-badge)) {
-    display: none;
-}
-
-/* Inline (above-content) variant: Filament always renders the badge
-   wrapper with the count even when 0, because `filled(0)` is true in
-   Laravel. Showing "0" next to a closed filter panel is noise — and
-   the active-filters indicators row below the toolbar already
-   communicates which filters are applied via removable chips. Hide
-   the count badge entirely for this variant. */
-.fi-ta-filters-trigger-action-ctn .fi-icon-btn-badge-ctn {
-    display: none;
-}
-
-/* Filters panel rendered inline above the table. Strip Filament's card
-   chrome (the .fi-ta frame already wraps everything) but keep gutters
-   that align with the toolbar below — so "Filters" sits flush with the
-   search input, not against the card edge. */
-.fi-ta-filters-above-content-ctn .fi-ta-filters {
-    background-color: transparent;
-    border: none;
-    padding: 1rem 1.5rem;
-    margin-block: 0;
-    gap: 1rem;
-}
-
-/* Hairline divider between the open filter panel and the toolbar that
-   follows it — without this they merge into one tall slab of dark. */
-.fi-ta-filters-above-content-ctn.fi-open {
-    border-bottom: 1px solid var(--fd-border-soft-light);
-}
-.dark .fi-ta-filters-above-content-ctn.fi-open {
-    border-bottom-color: var(--fd-border-soft-dark);
-}
-
-/* Active-filters bar lives flush inside the table frame (.fi-ta-main is
-   1216px-wide, no inner gutter). Without horizontal padding the label
-   and the trailing "remove all" X kiss the border on both sides. Match
-   the toolbar's 1.5rem inline gutter so the chip aligns with the search
-   input and the X aligns with the column-manager trigger above. */
-.fi-ta-filter-indicators {
-    background-color: transparent;
-    border: none;
-    padding: 0.25rem 1.5rem 0.75rem;
-    margin-block: 0;
-}
-
-/* Filters rendered inside a dropdown panel: the panel itself only carries
-   the popover chrome (0.375rem), so the form needs its own padding to
-   breathe. Match the inner gutter to the trigger's visual weight. */
-.fi-dropdown-panel > .fi-ta-filters {
-    padding: 1rem;
-    gap: 0.875rem;
-    margin-block: 0;
-}
-
-/* ==========================================================================
-   PAGINATION — flat in-line footer, no card chrome
-   ==========================================================================
-|
-| Strategy: we DO NOT touch Filament's grid / responsive / container-query
-| logic. Filament handles:
-|   - placement (grid-cols[1fr_auto_1fr] with col-start:2/3, justify-self)
-|   - responsive switch between "prev/next buttons" and "numbered items"
-|   - the compact vs. labelled per-page select
-|
-| Visual choice: the table is already framed (.fi-ta inner border + outer
-| ring). Wrapping the pagination in its own card stacks two frames and
-| reads as redundant. We strip the bg/border/radius and let it sit flat
-| on the canvas, separated from the table by margin only.
-*/
-
-/*
-| Pagination — flat in-line, no card chrome. Filament's grid layout
-| (`1fr auto 1fr`) keeps per-page mathematically centred. We just need
-| to give it room to breathe so it doesn't crowd the table border.
-*/
-.fi-ta-content-footer,
-.fi-pagination {
-    margin-top: calc(4px + 0.875rem);
-    background-color: transparent;
-    border: 0;
-    border-radius: 0;
-    padding: 0.5rem 1.25rem;
-    box-shadow: none;
-    align-items: center;
-    column-gap: 1rem;
-}
-.dark .fi-ta-content-footer,
-.dark .fi-pagination {
-    background-color: transparent;
-}
-
-/* Vertical centring across columns — Filament sometimes ships items
-   with different intrinsic heights (text overview vs button vs select),
-   without this they baseline-align and look misaligned. */
-.fi-pagination > * {
-    align-self: center;
-}
-
-/* "Showing 1 to 10 of 1,000 results" */
-.fi-pagination-overview {
-    color: var(--fi-color-gray-500);
-    font-size: 0.8125rem;
-    font-weight: 500;
-}
-.dark .fi-pagination-overview {
-    color: var(--fi-color-gray-400);
-}
-
-/* "Per page" prefix label inside the select wrapper */
-.fi-pagination-records-per-page-select-ctn .fi-input-wrp-prefix {
-    font-size: 0.6875rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--fi-color-gray-500);
-}
-
-/*
-| Active numbered page — honey fill with dark ink.
-| Filament's .fi-pagination-items is a <ol> with internal border-x-[0.5px]
-| dividers between <li> items and a shared white pill background. We keep
-| that group look, only flipping the active item to the primary honey.
-*/
-.fi-pagination-items {
-    background-color: transparent;
-    box-shadow: none;
-    border-radius: 0;
-    gap: 0.25rem;
-}
-.fi-pagination-item {
-    border: none;
-}
-.fi-pagination-item-btn {
-    border-radius: 2px;
-    background-color: var(--fd-surface);
-    box-shadow: none;
-    height: 2rem;
-    min-width: 2.25rem;
-    padding-inline: 0.375rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-}
-.dark .fi-pagination-item-btn {
-    background-color: var(--fi-color-gray-800);
-}
-.fi-pagination-item.fi-active .fi-pagination-item-btn {
-    background-color: var(--fd-border-soft-light);
-    background-image: none;
-    box-shadow: none;
-}
-.dark .fi-pagination-item.fi-active .fi-pagination-item-btn {
-    background-color: var(--fi-color-gray-700);
-}
-.fi-pagination-item.fi-active .fi-pagination-item-label {
-    color: oklch(0.28 0.02 45);
-}
-
-/* Search input — minimal, sits on the canvas */
-.fi-ta-search-field {
-    max-width: 22rem;
-}
-
-
-/* Table header cells — laravel.com style :
-   - Background quasi transparent (très léger gray-50)
-   - Label medium-weight, sentence-case avec très peu de tracking
-   - Hairline solide en bas, plus marquée que les rows
-   - Selection (.fi-ta-selection-cell) and actions header cells in <thead>
-     share the same surface so the row reads as one continuous band. */
-.fi-ta-header-cell,
-.fi-ta-table > thead > tr > .fi-ta-selection-cell,
-.fi-ta-actions-header-cell {
-    background-color: transparent;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: none;
-    letter-spacing: 0;
-    color: var(--fi-color-gray-600);
-    padding-block: 0.75rem;
-    border-bottom: 1px solid var(--fd-border-soft-light);
-}
-.dark .fi-ta-header-cell,
-.dark .fi-ta-table > thead > tr > .fi-ta-selection-cell,
-.dark .fi-ta-actions-header-cell {
-    background-color: color-mix(in oklch, var(--fi-color-gray-950) 70%, var(--fi-color-gray-900));
-    color: var(--fi-color-gray-400);
-    border-bottom-color: var(--fi-color-gray-800);
-}
-
-.fi-ta-header-cell-label {
-    font-weight: 600;
-}
-
-/* Rows — hairline divider, hover en gray-tint (pas primary-tint, sinon
-   les tables denses clignotent en rouge — laravel.com reste neutre). */
-.fi-ta-row {
-    background-color: transparent;
-    transition: background-color 100ms ease;
-    border-top: 1px solid var(--fd-border-soft-light);
-}
-/* Responsive split/stack layout (e.g. Authors) renders each record as a white
-   card by default — make it inherit the cream table surface for consistency. */
-.fi-ta-content,
-.fi-ta-record,
-.fi-ta-record-content,
-.fi-ta-record-content-ctn {
-    background-color: transparent;
-}
-.dark .fi-ta-content {
-    background-color: transparent;
-}
-/* Beat Filament's default divide-gray-200 so row hairlines read warm-tan. */
-.fi-ta-table tbody .fi-ta-row,
-.fi-ta-table > tbody > tr {
-    border-top-color: var(--fd-border-soft-light);
-}
-.dark .fi-ta-row,
-.dark .fi-ta-table tbody .fi-ta-row,
-.dark .fi-ta-table > tbody > tr {
-    border-top-color: var(--fd-border-soft-dark);
-}
-
-.fi-ta-row:hover {
-    background-color: color-mix(in oklch, var(--fi-color-primary-500) 16%, transparent);
-}
-.dark .fi-ta-row:hover {
-    background-color: color-mix(in oklch, var(--fi-color-primary-500) 18%, transparent);
-}
-
-.fi-ta-cell {
-    padding-block: 0.875rem;
-    font-size: 0.9375rem;
-    color: var(--fi-color-gray-800);
-}
-.dark .fi-ta-cell {
-    color: var(--fi-color-gray-200);
-}
-
-.fi-ta-text-item-label {
-    font-weight: 500;
-}
-
-/*
-| Image cells (ImageColumn / SpatieMediaLibraryImageColumn) — give the
-| <img> a sized, rounded thumbnail with a neutral fallback so empty or
-| broken sources still read as a deliberate placeholder rather than the
-| browser's default "missing image" glyph.
-*/
-.fi-ta-image {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.fi-ta-image img {
-    border-radius: var(--fd-radius-sm);
-    background-color: var(--fi-color-gray-100);
-    object-fit: cover;
-    border: 1px solid var(--fi-color-gray-200);
-}
-.dark .fi-ta-image img {
-    background-color: var(--fi-color-gray-800);
-    border-color: var(--fi-color-gray-700);
-}
-
-/* Broken / empty source — soft inset pattern instead of the OS placeholder.
-   The pseudo-element is invisible when the image actually loads. */
-.fi-ta-image img[src=""],
-.fi-ta-image img:not([src]) {
-    background-image:
-        linear-gradient(135deg,
-            var(--fi-color-gray-100) 25%, transparent 25%,
-            transparent 50%, var(--fi-color-gray-100) 50%,
-            var(--fi-color-gray-100) 75%, transparent 75%);
-    background-size: 8px 8px;
-    background-color: var(--fi-color-gray-50);
-}
-
-/*
-| Icon cells (IconColumn — booleans, statuses) — Filament wraps each
-| svg in `.fi-ta-icon` and tags the svg itself with `.fi-icon.fi-color-X`.
-| The default `.fi-text-color-600` rule wins specificity ties, so we
-| anchor on `.fi-ta-icon` to bump our selectors above it.
-*/
-.fi-ta-icon .fi-icon.fi-color-success { color: var(--fi-color-success-600); }
-.fi-ta-icon .fi-icon.fi-color-danger  { color: var(--fi-color-danger-600); }
-.fi-ta-icon .fi-icon.fi-color-warning { color: var(--fi-color-warning-600); }
-.fi-ta-icon .fi-icon.fi-color-primary { color: var(--fi-color-primary-600); }
-.fi-ta-icon .fi-icon.fi-color-info    { color: var(--fi-color-info-600); }
-.dark .fi-ta-icon .fi-icon.fi-color-success { color: var(--fi-color-success-400); }
-.dark .fi-ta-icon .fi-icon.fi-color-danger  { color: var(--fi-color-danger-400); }
-.dark .fi-ta-icon .fi-icon.fi-color-warning { color: var(--fi-color-warning-400); }
-.dark .fi-ta-icon .fi-icon.fi-color-primary { color: var(--fi-color-primary-400); }
-.dark .fi-ta-icon .fi-icon.fi-color-info    { color: var(--fi-color-info-400); }
-
-/* Selection cell (left checkbox column) — tighten so the row reads as a
-   clean horizontal band rather than a wide gutter. */
-.fi-ta-selection-cell {
-    inline-size: 2.5rem;
-    padding-inline: 0.75rem !important;
-}
-
-.fi-ta-selection-cell .fi-checkbox-input {
-    inline-size: 1rem;
-    block-size: 1rem;
-}
-
-/* Subtle striping on hover via row signal already covers density well;
-   here we just make sure cell padding stays even when a column shows a
-   stack (image + text) and another shows plain text. */
-.fi-ta-stack {
-    gap: 0.25rem;
-}
-
-/* ==========================================================================
-   11. BADGES
-   ========================================================================== */
-
-.fi-badge {
-    border-radius: 2px;
-    font-weight: 500;
-    font-size: 0.6875rem;
-    letter-spacing: 0;
-    text-transform: none;
-    padding-inline: 0.375rem;
-    padding-block: 0.125rem;
-    border: none;
-}
-
-/* ==========================================================================
-   12. TABS — laravel.com pill segmented (transparent strip, white pill on active)
-   ==========================================================================
-|
-| Laravel.com style: the tab strip itself is barely there (transparent
-| or canvas-coloured background, hairline border just to define the
-| pill shape). All visual emphasis goes to the active item — a white
-| pill with soft shadow and ring — while inactive items are plain text.
-| Active text stays in the gray scale (NOT primary), so the contrast
-| comes from the surface lift, not from a brand-coloured label.
-*/
-
-.fi-tabs,
-.fi-page-tabs {
-    background-color: transparent;
-    border-radius: 0;
-    padding: 0;
-    display: flex;
-    width: 100%;
-    justify-content: flex-start;
-    margin-inline: 0;
-    gap: 0.25rem;
-    border: none;
-    border-bottom: 1px solid var(--fd-border-soft-light);
-}
-.dark .fi-tabs,
-.dark .fi-page-tabs {
-    border-bottom-color: var(--fd-border-soft-dark);
-}
-
-.fi-tabs-item {
-    border-radius: 0;
-    padding: 0.5rem 0.875rem;
-    margin-bottom: -1px;
-    font-weight: 600;
-    font-size: 0.8125rem;
-    color: var(--fi-color-gray-600);
-    border: none;
-    background: transparent;
-    transition: color 140ms ease, box-shadow 140ms ease;
-}
-.dark .fi-tabs-item { color: var(--fi-color-gray-400); }
-
-.fi-tabs-item:hover { color: var(--fi-color-gray-900); }
-.dark .fi-tabs-item:hover { color: var(--fi-color-gray-100); }
-
-.fi-tabs-item.fi-active {
-    background-color: transparent;
-    color: var(--fi-color-gray-900);
-    border-radius: 0;
-    box-shadow: inset 0 -2px 0 0 var(--fi-color-primary-500);
-}
-.dark .fi-tabs-item.fi-active {
-    background-color: transparent;
-    color: var(--fi-color-gray-50);
-    box-shadow: inset 0 -2px 0 0 var(--fi-color-primary-500);
-}
-
-/*
-| Tab icons — Filament defaults paint the active icon in primary
-| (e.g. .fi-tabs-item.fi-active .fi-icon { color: var(--fi-color-primary-...) }),
-| which clashes with our gray-900 active text. We force both states to
-| inherit the button's text colour so icon + label read as one unit.
-*/
-.fi-tabs-item > .fi-icon,
-.fi-tabs-item.fi-active > .fi-icon {
-    color: inherit !important;
-}
-
-/* ==========================================================================
-   12b. CONTAINED TABS — Tabs schema in forms / infolists
-   ==========================================================================
-|
-| `Schemas\Components\Tabs` renders as `.fi-sc-tabs.fi-contained` which
-| wraps the tab strip + the active tab's content panel. By default the
-| panel content floats unanchored on the canvas — our other sections
-| have a frame, this one didn't. We wrap the whole block in the same
-| double-frame as `.fi-section` and demote the inner tab strip to a
-| header by removing its pill border so it doesn't double up on the
-| outer frame.
-*/
-
-.fi-sc-tabs.fi-contained {
-    background-color: var(--fd-surface);
-    background-image: var(--fd-corners);
-    background-position: var(--fd-corner-pos);
-    background-repeat: no-repeat;
-    border: none;
-    border-radius: 2px;
-    padding: 1rem 1.25rem 1.5rem;
-    box-shadow: none;
-}
-.dark .fi-sc-tabs.fi-contained {
-    background-color: var(--fi-color-gray-900);
-}
-
-/* Tab strip inside a contained block: drop the pill border so it reads
-   as a section header rather than a free-floating control. */
-.fi-sc-tabs.fi-contained > .fi-tabs.fi-contained {
-    border: 0;
-    margin-bottom: 1rem;
-    padding-inline: 0;
-    align-self: flex-start;
-}
-
-/* Active tab panel — let it occupy the section content area cleanly. */
-.fi-sc-tabs.fi-contained > .fi-sc-tabs-tab {
-    padding: 0;
-}
-
-/* ==========================================================================
-   12c. INFOLIST ENTRIES — label / value typography
-   ==========================================================================
-|
-| Default Filament renders both the label (eyebrow above the value)
-| and the value itself in similar dark text, which flattens the
-| read-order. We push the label into a quieter gray with a touch of
-| weight, and lift the value to feel like the answer to the label's
-| question.
-*/
-
-.fi-in-entry-label {
-    font-size: 0.8125rem;
-    font-weight: 600;
-    color: var(--fi-color-gray-500);
-    text-transform: none;
-    letter-spacing: 0;
-    line-height: 1.4;
-}
-.dark .fi-in-entry-label {
-    color: var(--fi-color-gray-400);
-}
-
-.fi-in-entry-label-ctn {
-    margin-bottom: 0.375rem;
-}
-
-.fi-in-entry-content {
-    font-size: 0.9375rem;
-    color: var(--fi-color-gray-900);
-    line-height: 1.45;
-}
-.dark .fi-in-entry-content {
-    color: var(--fi-color-gray-50);
-}
-
-/* Numeric / monetary values look sharper with tabular figures. */
-.fi-in-text-item {
-    font-variant-numeric: tabular-nums;
-}
-
-/* ==========================================================================
-   13. DROPDOWN, MODAL
-   ========================================================================== */
-
-.fi-dropdown-panel {
-    border-radius: 2px;
-    border: none;
-    box-shadow: var(--fd-shadow-lg);
-    padding: 0.375rem;
-    background-color: var(--fd-surface);
-    background-image: var(--fd-corners);
-    background-position: var(--fd-corner-pos);
-    background-repeat: no-repeat;
-}
-.dark .fi-dropdown-panel {
-    background-color: var(--fi-color-gray-900);
-}
-
-.fi-dropdown-header {
-    padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid var(--fd-border-soft-light);
-    margin-bottom: 0.375rem;
-}
-.dark .fi-dropdown-header {
-    border-bottom-color: var(--fd-border-soft-dark);
-}
-
-.fi-dropdown-list-item {
-    border-radius: var(--fd-radius-sm);
-    font-size: 0.9375rem;
-    transition: background-color 100ms ease, color 100ms ease;
-}
-.fi-dropdown-list-item:hover {
-    background-color: color-mix(in oklch, var(--fi-color-primary-500) 7%, transparent);
-    color: var(--fi-color-primary-700);
-}
-.dark .fi-dropdown-list-item:hover {
-    color: var(--fi-color-primary-300);
-}
-
-/*
-| Modals — same structural language as .fi-section: hairline border,
-| header / content / footer separated by 1px dividers, footer on a
-| subtly tinted surface so action buttons read as a deliberate region.
-| The window keeps a softer corner (12px) and a richer outer shadow
-| since it sits over a backdrop, not a page.
-*/
-.fi-modal-window {
-    border-radius: 2px;
-    box-shadow: var(--fd-shadow-lg);
-    border: none;
-    background-color: var(--fd-surface);
-    background-image: var(--fd-corners);
-    background-position: var(--fd-corner-pos);
-    background-repeat: no-repeat;
-}
-.dark .fi-modal-window {
-    background-color: var(--fi-color-gray-900);
-}
-
-/* Header — chapter heading with a clean divider beneath. Asymmetric
-   padding (more above than below) matches .fi-section-header. */
-.fi-modal-window-has-content > .fi-modal-header,
-.fi-modal-window-has-footer > .fi-modal-header {
-    padding: 1.25rem 1.5rem 1.125rem;
-    border-bottom: var(--fd-stroke) solid var(--fi-color-gray-200);
-}
-.dark .fi-modal-window-has-content > .fi-modal-header,
-.dark .fi-modal-window-has-footer > .fi-modal-header {
-    border-bottom-color: var(--fi-color-gray-800);
-}
-
-.fi-modal-heading {
-    font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: -0.015em;
-    font-size: 1.125rem;
-    color: var(--fi-color-gray-900);
-}
-.dark .fi-modal-heading {
-    color: var(--fi-color-gray-50);
-}
-
-.fi-modal-description {
-    font-size: 0.8125rem;
-    color: var(--fi-color-gray-500);
-    margin-top: 0.25rem;
-    line-height: 1.5;
-}
-
-/* Content — match the section content padding so forms inside breathe
-   with the same rhythm as forms inside .fi-section. */
-.fi-modal-window-has-content > .fi-modal-content {
-    padding: 1.5rem 1.5rem 1.625rem;
-}
-
-/* Footer — tinted surface + top divider, mirrors .fi-section-footer.
-   Action row is right-aligned by default; honor explicit alignment classes. */
-.fi-modal-window-has-footer > .fi-modal-footer {
-    padding: 0.875rem 1.5rem;
-    border-top: var(--fd-stroke) solid var(--fd-border-soft-light);
-    background-color: var(--fi-color-gray-50);
-}
-.dark .fi-modal-window-has-footer > .fi-modal-footer {
-    border-top-color: var(--fd-border-soft-dark);
-    background-color: var(--fi-color-gray-950);
-}
-
-/* Slide-over modals (notifications, side panels) — keep them flush with
-   the viewport edge (no rounded outer corners on the side that meets it). */
-.fi-modal-slide-over .fi-modal-window {
-    border-radius: 0;
-    box-shadow: var(--fd-shadow-lg);
-}
-.fi-modal-slide-over-from-end .fi-modal-window {
-    border-right: none;
-}
-.fi-modal-slide-over-from-start .fi-modal-window {
-    border-left: none;
-}
-
-/* ==========================================================================
-   14. NOTIFICATIONS — quiet list, accent on unread only
-   ========================================================================== */
-
-/* Toast container (top-right floating notifications) */
-.fi-no {
-    gap: 0.5rem;
-    padding: 1rem;
-}
-
-/* Each notification card (toast OR list item) — minimal chrome,
-   colour-tinted left edge to convey severity. */
-.fi-no-notification {
-    border-radius: var(--fd-radius-sm);
-    border: 1px solid var(--fi-color-gray-200);
-    background-color: white;
-    box-shadow: var(--fd-shadow-sm);
-    overflow: hidden;
-    position: relative;
-}
-.dark .fi-no-notification {
-    border-color: var(--fi-color-gray-800);
-    background-color: var(--fi-color-gray-900);
-}
-
-/* Toasts (when shown over the page) get a richer shadow + the colored bar */
-.fi-no > .fi-no-notification {
-    box-shadow: var(--fd-shadow-lg);
-    border-left-width: 3px;
-    border-left-color: var(--fi-color-primary-500);
-}
-.fi-no > .fi-no-notification.fi-color-success { border-left-color: var(--fi-color-success-500); }
-.fi-no > .fi-no-notification.fi-color-warning { border-left-color: var(--fi-color-warning-500); }
-.fi-no > .fi-no-notification.fi-color-danger  { border-left-color: var(--fi-color-danger-500); }
-.fi-no > .fi-no-notification.fi-color-info    { border-left-color: var(--fi-color-info-500); }
-
-/*
-| Database notifications — rendered as a slide-over modal. We keep the
-| modal shell minimal and let each item read as a clean row. The unread
-| indicator is a small red dot at the LEFT of the row. Per-item close
-| buttons fade in only on hover to keep the list calm.
-*/
-
-.fi-no-database,
-.fi-no-database .fi-modal-window {
-    background-color: white;
-}
-.dark .fi-no-database,
-.dark .fi-no-database .fi-modal-window {
-    background-color: var(--fi-color-gray-900);
-}
-
-/* Header — laravel.com style: bigger semibold title, primary-tinted count
-   chip, primary-color text-actions for the affirmative one. */
-.fi-no-database .fi-modal-header {
-    padding-bottom: 0.875rem;
-    border-bottom: 1px solid var(--fd-border-soft-light);
-}
-.dark .fi-no-database .fi-modal-header {
-    border-bottom-color: var(--fd-border-soft-dark);
-}
-
-.fi-no-database .fi-modal-heading {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.0625rem;
-    letter-spacing: -0.015em;
-    color: var(--fi-color-gray-900);
-}
-.dark .fi-no-database .fi-modal-heading {
-    color: var(--fi-color-gray-50);
-}
-
-/* Unread count chip — soft primary tint so the panel reads "X waiting"
-   the moment it opens. */
-.fi-no-database .fi-modal-heading .fi-badge {
-    background-color: color-mix(in oklch, var(--fi-color-primary-500) 12%, transparent);
-    color: var(--fi-color-primary-700);
-    border: 1px solid color-mix(in oklch, var(--fi-color-primary-500) 18%, transparent);
-    padding: 0.0625rem 0.4375rem;
-    border-radius: var(--fd-pill);
-    font-size: 0.6875rem;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    line-height: 1.4;
-}
-.dark .fi-no-database .fi-modal-heading .fi-badge {
-    color: var(--fi-color-primary-300);
-    background-color: color-mix(in oklch, var(--fi-color-primary-500) 18%, transparent);
-    border-color: color-mix(in oklch, var(--fi-color-primary-500) 28%, transparent);
-}
-
-/* Mark-all-read + Clear — keep semantic colors but quiet and laravel-like:
-   primary-tinted affirmative action, danger-tinted destructive one. */
-.fi-no-database .fi-ac {
-    margin-top: 0.375rem;
-    gap: 0.875rem;
-}
-.fi-no-database .fi-ac .fi-link {
-    font-size: 0.8125rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: color var(--fd-duration-slow) var(--fd-ease-out);
-}
-.fi-no-database .fi-ac .fi-link.fi-color-primary,
-.fi-no-database .fi-ac .fi-link:not(.fi-color-danger):not(.fi-color-warning):not(.fi-color-success) {
-    color: var(--fi-color-primary-600);
-}
-.fi-no-database .fi-ac .fi-link.fi-color-primary:hover,
-.fi-no-database .fi-ac .fi-link:not(.fi-color-danger):not(.fi-color-warning):not(.fi-color-success):hover {
-    color: var(--fi-color-primary-700);
-}
-.dark .fi-no-database .fi-ac .fi-link.fi-color-primary,
-.dark .fi-no-database .fi-ac .fi-link:not(.fi-color-danger):not(.fi-color-warning):not(.fi-color-success) {
-    color: var(--fi-color-primary-400);
-}
-.dark .fi-no-database .fi-ac .fi-link.fi-color-primary:hover,
-.dark .fi-no-database .fi-ac .fi-link:not(.fi-color-danger):not(.fi-color-warning):not(.fi-color-success):hover {
-    color: var(--fi-color-primary-300);
-}
-.fi-no-database .fi-ac .fi-link.fi-color-danger {
-    color: var(--fi-color-danger-600);
-}
-.fi-no-database .fi-ac .fi-link.fi-color-danger:hover {
-    color: var(--fi-color-danger-700);
-}
-
-/* Inside the panel, notifications are stacked: kill their own borders /
-   shadows so they read as a clean list, separated by hairline dividers. */
-.fi-no-database .fi-no-notification {
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-    background-color: transparent;
-    padding: 1rem 1rem 1rem 1.75rem;
-    position: relative;
-    gap: 0.875rem;
-    transition: background-color var(--fd-duration-slow) var(--fd-ease-out);
-}
-.fi-no-database .fi-no-notification + .fi-no-notification {
-    border-top: 1px solid var(--fd-border-soft-light);
-}
-.dark .fi-no-database .fi-no-notification + .fi-no-notification {
-    border-top-color: var(--fd-border-soft-dark);
-}
-
-/* Icon — primary-tinted square. Subtle but unmistakably on-brand. */
-.fi-no-database .fi-no-notification-icon {
-    flex-shrink: 0;
-    width: 2.25rem;
-    height: 2.25rem;
-    padding: 0.5rem;
-    border-radius: var(--fd-radius-sm);
-    background-color: color-mix(in oklch, var(--fi-color-primary-500) 10%, transparent);
-    color: var(--fi-color-primary-600);
-    border: 1px solid color-mix(in oklch, var(--fi-color-primary-500) 16%, transparent);
-}
-.dark .fi-no-database .fi-no-notification-icon {
-    background-color: color-mix(in oklch, var(--fi-color-primary-500) 16%, transparent);
-    color: var(--fi-color-primary-300);
-    border-color: color-mix(in oklch, var(--fi-color-primary-500) 28%, transparent);
-}
-/* Per-color overrides — keep the icon tinted by the notification's own
-   semantic color when set (info/success/warning/danger). */
-.fi-no-database .fi-no-notification.fi-color-info .fi-no-notification-icon {
-    background-color: color-mix(in oklch, var(--fi-color-info-500) 10%, transparent);
-    color: var(--fi-color-info-600);
-    border-color: color-mix(in oklch, var(--fi-color-info-500) 16%, transparent);
-}
-.fi-no-database .fi-no-notification.fi-color-success .fi-no-notification-icon {
-    background-color: color-mix(in oklch, var(--fi-color-success-500) 10%, transparent);
-    color: var(--fi-color-success-600);
-    border-color: color-mix(in oklch, var(--fi-color-success-500) 16%, transparent);
-}
-.fi-no-database .fi-no-notification.fi-color-warning .fi-no-notification-icon {
-    background-color: color-mix(in oklch, var(--fi-color-warning-500) 12%, transparent);
-    color: var(--fi-color-warning-700);
-    border-color: color-mix(in oklch, var(--fi-color-warning-500) 18%, transparent);
-}
-.fi-no-database .fi-no-notification.fi-color-danger .fi-no-notification-icon {
-    background-color: color-mix(in oklch, var(--fi-color-danger-500) 10%, transparent);
-    color: var(--fi-color-danger-600);
-    border-color: color-mix(in oklch, var(--fi-color-danger-500) 16%, transparent);
-}
-
-/* Title — tighter weight + tracking, sits on the same baseline as the date */
-.fi-no-database .fi-no-notification-title {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 0.875rem;
-    letter-spacing: -0.005em;
-    color: var(--fi-color-gray-900);
-    line-height: 1.3;
-}
-.dark .fi-no-database .fi-no-notification-title {
-    color: var(--fi-color-gray-50);
-}
-
-.fi-no-database .fi-no-notification-date {
-    font-size: 0.75rem;
-    color: var(--fi-color-gray-500);
-    font-variant-numeric: tabular-nums;
-    margin-top: 0.125rem;
-    display: block;
-}
-
-.fi-no-database .fi-no-notification-body {
-    font-size: 0.8125rem;
-    color: var(--fi-color-gray-600);
-    margin-top: 0.375rem;
-    line-height: 1.5;
-}
-.dark .fi-no-database .fi-no-notification-body {
-    color: var(--fi-color-gray-400);
-}
-
-/* Action row inside the notification ("View" link) — primary-colored
-   text-link, laravel.com style. */
-.fi-no-database .fi-no-notification-actions {
-    margin-top: 0.625rem;
-}
-.fi-no-database .fi-no-notification-actions .fi-link {
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: var(--fi-color-primary-600);
-    text-decoration: none;
-    transition: color var(--fd-duration-slow) var(--fd-ease-out);
-}
-.fi-no-database .fi-no-notification-actions .fi-link:hover {
-    color: var(--fi-color-primary-700);
-}
-.dark .fi-no-database .fi-no-notification-actions .fi-link {
-    color: var(--fi-color-primary-400);
-}
-.dark .fi-no-database .fi-no-notification-actions .fi-link:hover {
-    color: var(--fi-color-primary-300);
-}
-
-/* Per-item close (X) button — hidden until row hover to remove visual noise */
-.fi-no-database .fi-no-notification-close-btn {
-    opacity: 0;
-    transition: opacity var(--fd-duration-slow) var(--fd-ease-out),
-                color var(--fd-duration-slow) var(--fd-ease-out);
-    color: var(--fi-color-gray-400);
-}
-.fi-no-database .fi-no-notification:hover .fi-no-notification-close-btn,
-.fi-no-database .fi-no-notification-close-btn:focus-visible {
-    opacity: 1;
-}
-.fi-no-database .fi-no-notification-close-btn:hover {
-    color: var(--fi-color-gray-700);
-}
-.dark .fi-no-database .fi-no-notification-close-btn:hover {
-    color: var(--fi-color-gray-200);
-}
-
-/* Unread state — left-side primary-colored dot. The wrapper is OUTSIDE
-   the notification's color modifier, so primary resolves to the panel's
-   active palette (honey/powder/minty) configured on body. */
-.fi-no-database .fi-no-notification-unread-ctn {
-    background-color: transparent;
-}
-
-.fi-no-database .fi-no-notification-unread-ctn::before {
-    content: '';
-    position: absolute;
-    left: 0.625rem;
-    top: 1.375rem;
-    width: 0.4375rem;
-    height: 0.4375rem;
-    background-color: var(--fi-color-primary-500);
-    border-radius: 9999px;
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--fi-color-primary-500) 22%, transparent);
-    z-index: 2;
-}
-
-.fi-no-database .fi-no-notification-read-ctn {
-    opacity: 0.7;
-}
-
-/* Hover row tint — soft primary tint so the brand color stays present. */
-.fi-no-database .fi-no-notification:hover {
-    background-color: color-mix(in oklch, var(--fi-color-primary-500) 4%, transparent);
-}
-.dark .fi-no-database .fi-no-notification:hover {
-    background-color: color-mix(in oklch, var(--fi-color-primary-500) 8%, transparent);
-}
-
-/* ==========================================================================
-   15. CALLOUTS — alert-style content blocks
-   ========================================================================== */
-
-.fi-callout,
-.fi-sc-callout {
-    border-radius: var(--fd-radius);
-    border: 1px solid var(--fi-color-gray-200);
-    background-color: white;
-    padding: 1rem 1.25rem;
-    box-shadow: var(--fd-shadow-sm);
-    position: relative;
-}
-.dark .fi-callout,
-.dark .fi-sc-callout {
-    background-color: var(--fi-color-gray-900);
-    border-color: var(--fi-color-gray-800);
-}
-
-.fi-callout::after,
-.fi-sc-callout::after {
-    content: '';
-    position: absolute;
-    top: -1px;
-    left: -1px;
-    bottom: -1px;
-    width: 4px;
-    background-color: var(--fi-color-primary-500);
-    border-radius: var(--fd-radius) 0 0 var(--fd-radius);
-}
-
-.fi-callout.fi-color-success::after, .fi-sc-callout.fi-color-success::after { background-color: var(--fi-color-success-500); }
-.fi-callout.fi-color-warning::after, .fi-sc-callout.fi-color-warning::after { background-color: var(--fi-color-warning-500); }
-.fi-callout.fi-color-danger::after,  .fi-sc-callout.fi-color-danger::after  { background-color: var(--fi-color-danger-500); }
-.fi-callout.fi-color-info::after,    .fi-sc-callout.fi-color-info::after    { background-color: var(--fi-color-info-500); }
-
-.fi-callout-heading {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 0.9375rem;
-    letter-spacing: -0.01em;
-    color: var(--fi-color-gray-900);
-}
-.dark .fi-callout-heading {
-    color: var(--fi-color-gray-50);
-}
-
-.fi-callout-description {
-    font-size: 0.875rem;
-    color: var(--fi-color-gray-600);
-    margin-top: 0.25rem;
-}
-.dark .fi-callout-description {
-    color: var(--fi-color-gray-400);
-}
-
-.fi-callout-icon {
-    color: var(--fi-color-primary-500);
-}
-
-/* ==========================================================================
-   16. EMPTY STATES — centered, generous, friendly
-   ========================================================================== */
-
-.fi-empty-state {
-    background-color: white;
-    border: 1px solid var(--fd-border-soft-light);
-    border-radius: var(--fd-radius);
-    padding: 3rem 2rem;
-    text-align: center;
-}
-.dark .fi-empty-state {
-    background-color: var(--fi-color-gray-900);
-    border-color: var(--fd-border-soft-dark);
-}
-
-.fi-empty-state-icon-bg {
-    background: radial-gradient(
-        circle at center,
-        color-mix(in oklch, var(--fi-color-primary-500) 18%, transparent),
-        transparent 70%
-    );
-    border: 1px solid var(--fi-color-primary-300);
-    border-radius: 9999px;
-    width: 4.5rem;
-    height: 4.5rem;
-    margin-inline: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--fi-color-primary-600);
-}
-.dark .fi-empty-state-icon-bg {
-    color: var(--fi-color-primary-400);
-}
-
-.fi-empty-state-heading {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.0625rem;
-    letter-spacing: -0.015em;
-    margin-top: 1rem;
-    color: var(--fi-color-gray-900);
-}
-.dark .fi-empty-state-heading {
-    color: var(--fi-color-gray-50);
-}
-
-.fi-empty-state-description {
-    color: var(--fi-color-gray-500);
-    font-size: 0.9375rem;
-    margin-top: 0.5rem;
-    max-width: 28rem;
-    margin-inline: auto;
-}
-
-/* ==========================================================================
-   17. WIDGETS — stats laravel.com / cloud.laravel.com :
-       label discret au-dessus, gros nombre, description tabular-num
-   ========================================================================== */
-
-.fi-wi-stats-overview {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    padding: 0;
-}
-
-.fi-wi-stats-overview-stat {
-    background-color: var(--fd-surface);
-    background-image: var(--fd-corners);
-    background-position: var(--fd-corner-pos);
-    background-repeat: no-repeat;
-    border: none;
-    border-radius: 2px;
-    padding: 1.25rem 1.375rem 1.375rem;
-    transition: box-shadow 160ms var(--fd-ease-out),
-                transform 160ms var(--fd-ease-out);
-    position: relative;
-    box-shadow: none;
-    --tw-ring-shadow: 0 0 #0000;
-    --tw-shadow: 0 0 #0000;
-}
-.dark .fi-wi-stats-overview-stat {
-    background-color: var(--fi-color-gray-900);
-}
-.fi-wi-stats-overview-stat:hover {
-    box-shadow: var(--fd-shadow-sm);
-}
-
-/* Stats card content sits above any decorative layers (sparkline canvas, etc.). */
-.fi-wi-stats-overview-stat-content {
-    position: relative;
-    z-index: 2;
-    display: flex;
-    flex-direction: column;
-}
-
-.fi-wi-stats-overview-stat-label-ctn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.fi-wi-stats-overview-stat-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--fi-color-gray-600);
-    text-transform: none;
-    letter-spacing: 0;
-    line-height: 1.4;
-}
-.dark .fi-wi-stats-overview-stat-label {
-    color: var(--fi-color-gray-400);
-}
-
-.fi-wi-stats-overview-stat-value {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    font-weight: 700;
-    letter-spacing: -0.035em;
-    line-height: 1.1;
-    margin-top: 0.375rem;
-    color: var(--fi-color-gray-900);
-    font-variant-numeric: tabular-nums;
-}
-.dark .fi-wi-stats-overview-stat-value {
-    color: var(--fi-color-gray-50);
-}
-
-.fi-wi-stats-overview-stat-description {
-    font-size: 0.8125rem;
-    color: var(--fi-color-gray-500);
-    margin-top: 0.5rem;
-    font-variant-numeric: tabular-nums;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-}
-
-.fi-wi-stats-overview-stat-description-icon {
-    width: 0.875rem;
-    height: 0.875rem;
-}
-
-/*
-| Description colour variants — Filament emits .fi-color-{name} on the
-| description block via ->color(). Map each variant to the palette so the
-| icon + text read consistently with the rest of the panel.
-*/
-.fi-wi-stats-overview-stat-description.fi-color-primary { color: var(--fi-color-primary-600); }
-.fi-wi-stats-overview-stat-description.fi-color-success { color: var(--fi-color-success-600); }
-.fi-wi-stats-overview-stat-description.fi-color-warning { color: var(--fi-color-warning-600); }
-.fi-wi-stats-overview-stat-description.fi-color-danger  { color: var(--fi-color-danger-600); }
-.fi-wi-stats-overview-stat-description.fi-color-info    { color: var(--fi-color-info-600); }
-.dark .fi-wi-stats-overview-stat-description.fi-color-primary { color: var(--fi-color-primary-400); }
-.dark .fi-wi-stats-overview-stat-description.fi-color-success { color: var(--fi-color-success-400); }
-.dark .fi-wi-stats-overview-stat-description.fi-color-warning { color: var(--fi-color-warning-400); }
-.dark .fi-wi-stats-overview-stat-description.fi-color-danger  { color: var(--fi-color-danger-400); }
-.dark .fi-wi-stats-overview-stat-description.fi-color-info    { color: var(--fi-color-info-400); }
-
-/*
-| Sparkline (StatsOverviewWidget::Stat::chart()) — sits inside the card.
-| Filament reads the colour of the two hidden <span> tokens via
-| getComputedStyle() and feeds them straight into Chart.js. We size and
-| position the canvas, then map every fi-color-* variant to a tinted
-| stroke and a translucent fill that match our palette.
-*/
-.fi-wi-stats-overview-stat-chart {
-    position: absolute;
-    inset: auto 0 0 0;
-    height: 56px;
-    z-index: 1;
-    pointer-events: none;
-    opacity: 0.85;
-    mask-image: linear-gradient(to bottom, transparent 0, black 35%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 35%);
-}
-
-.fi-wi-stats-overview-stat-chart canvas {
-    width: 100% !important;
-    height: 100% !important;
-    display: block;
-}
-
-/* Default (gray) — same hue as the description, low contrast. */
-.fi-wi-stats-overview-stat-chart .fi-wi-stats-overview-stat-chart-bg-color {
-    color: color-mix(in oklch, var(--fi-color-gray-500) 18%, transparent);
-}
-.fi-wi-stats-overview-stat-chart .fi-wi-stats-overview-stat-chart-border-color {
-    color: var(--fi-color-gray-400);
-}
-
-/* Coloured variants — dataset borderColor / backgroundColor are fed by
-   `color` of these spans, so opacity is encoded into the colour itself. */
-.fi-wi-stats-overview-stat-chart.fi-color-primary .fi-wi-stats-overview-stat-chart-bg-color {
-    color: color-mix(in oklch, var(--fi-color-primary-500) 22%, transparent);
-}
-.fi-wi-stats-overview-stat-chart.fi-color-primary .fi-wi-stats-overview-stat-chart-border-color {
-    color: var(--fi-color-primary-500);
-}
-
-.fi-wi-stats-overview-stat-chart.fi-color-success .fi-wi-stats-overview-stat-chart-bg-color {
-    color: color-mix(in oklch, var(--fi-color-success-500) 22%, transparent);
-}
-.fi-wi-stats-overview-stat-chart.fi-color-success .fi-wi-stats-overview-stat-chart-border-color {
-    color: var(--fi-color-success-500);
-}
-
-.fi-wi-stats-overview-stat-chart.fi-color-warning .fi-wi-stats-overview-stat-chart-bg-color {
-    color: color-mix(in oklch, var(--fi-color-warning-500) 22%, transparent);
-}
-.fi-wi-stats-overview-stat-chart.fi-color-warning .fi-wi-stats-overview-stat-chart-border-color {
-    color: var(--fi-color-warning-500);
-}
-
-.fi-wi-stats-overview-stat-chart.fi-color-danger .fi-wi-stats-overview-stat-chart-bg-color {
-    color: color-mix(in oklch, var(--fi-color-danger-500) 22%, transparent);
-}
-.fi-wi-stats-overview-stat-chart.fi-color-danger .fi-wi-stats-overview-stat-chart-border-color {
-    color: var(--fi-color-danger-500);
-}
-
-.fi-wi-stats-overview-stat-chart.fi-color-info .fi-wi-stats-overview-stat-chart-bg-color {
-    color: color-mix(in oklch, var(--fi-color-info-500) 22%, transparent);
-}
-.fi-wi-stats-overview-stat-chart.fi-color-info .fi-wi-stats-overview-stat-chart-border-color {
-    color: var(--fi-color-info-500);
-}
-
-/* ==========================================================================
-   17b. CHART WIDGETS — section frame + axis/grid theming + filter polish
-   ==========================================================================
-|
-| Filament's ChartWidget renders a <canvas> Chart.js plot inside the
-| standard .fi-section. Four hidden <span> tokens carry the default
-| colours that Chart.js reads via getComputedStyle():
-|
-|   .fi-wi-chart-bg-color       → datasets default backgroundColor
-|   .fi-wi-chart-border-color   → datasets default borderColor
-|   .fi-wi-chart-grid-color     → x/y grid lines
-|   .fi-wi-chart-text-color     → axis labels, legend, tooltip text
-|
-| Caveat: a widget that defines `backgroundColor` / `borderColor`
-| explicitly inside its dataset overrides the bg/border tokens (Chart.js
-| dataset > Chart.js options). The grid + text tokens always apply, so
-| this section guarantees axis/grid/legend cohesion across every chart
-| in the panel — even those with custom palettes.
-*/
-
-.fi-wi-chart-text-color { color: var(--fi-color-gray-500); }
-.dark .fi-wi-chart-text-color { color: var(--fi-color-gray-400); }
-
-.fi-wi-chart-grid-color {
-    color: color-mix(in oklch, var(--fi-color-gray-500) 14%, transparent);
-}
-.dark .fi-wi-chart-grid-color {
-    color: color-mix(in oklch, var(--fi-color-gray-400) 12%, transparent);
-}
-
-/* Default dataset colour — only effective when a chart does NOT specify
-   backgroundColor / borderColor in its dataset. New widgets built on top
-   of this theme inherit the brand honey automatically. */
-.fi-wi-chart-bg-color {
-    color: color-mix(in oklch, var(--fi-color-primary-500) 14%, transparent);
-}
-.fi-wi-chart-border-color { color: var(--fi-color-primary-500); }
-
-/* Canvas container — ensure consistent breathing room and a stable height
-   so multi-row dashboards align cleanly. */
-.fi-wi-chart-canvas-ctn {
-    padding: 0.5rem 0.25rem 0;
-    min-height: 240px;
-}
-
-.fi-wi-chart-canvas-ctn canvas {
-    font-family: var(--font-sans);
-}
-
-/* Filter dropdown / select sitting in the chart header. Filament places
-   it via x-slot:afterHeader so it floats next to the heading on the
-   right. We refine the input chrome to read as a quiet pill. */
-.fi-wi-chart-filter {
-    min-width: 9rem;
-}
-
-.fi-wi-chart-filter .fi-input-wrp {
-    border-radius: var(--fd-pill);
-    background-color: var(--fi-color-gray-50);
-    border-color: var(--fi-color-gray-200);
-    box-shadow: none;
-}
-.dark .fi-wi-chart-filter .fi-input-wrp {
-    background-color: var(--fi-color-gray-950);
-    border-color: var(--fi-color-gray-800);
-}
-
-.fi-wi-chart-filter .fi-input-wrp:focus-within {
-    background-color: white;
-    border-color: var(--fi-color-primary-500);
-    box-shadow: 0 0 0 3px color-mix(in oklch, var(--fi-color-primary-500) var(--fd-glow-mix), transparent);
-}
-.dark .fi-wi-chart-filter .fi-input-wrp:focus-within {
-    background-color: var(--fi-color-gray-900);
-}
-
-.fi-wi-chart-filter .fi-input-wrp-prefix {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--fi-color-gray-500);
-    text-transform: none;
-    letter-spacing: 0;
-}
-
-/* Filter content (shown inside the chart filter dropdown) */
-.fi-wi-chart-filter-content {
-    padding: 0.75rem;
-}
-
-.fi-wi-chart-filter-content-actions-ctn {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid var(--fd-border-soft-light);
-}
-.dark .fi-wi-chart-filter-content-actions-ctn {
-    border-top-color: var(--fd-border-soft-dark);
-}
-
-/* ==========================================================================
-   18. AUTH (login / register / reset) — primary honey aurora
-   ========================================================================== */
-
-.fi-simple-layout {
-    background:
-        radial-gradient(
-            ellipse 75% 55% at 50% -10%,
-            color-mix(in oklch, var(--fi-color-primary-500) 10%, transparent),
-            transparent 60%
-        ),
-        var(--fi-color-gray-50);
-    min-height: 100vh;
-}
-.dark .fi-simple-layout {
-    background:
-        radial-gradient(
-            ellipse 75% 55% at 50% -10%,
-            color-mix(in oklch, var(--fi-color-primary-500) 14%, transparent),
-            transparent 60%
-        ),
-        var(--fi-color-gray-950);
-}
-
-.fi-simple-main {
-    border-radius: var(--fd-radius);
-    box-shadow: var(--fd-shadow-lg);
-    border: 1px solid var(--fi-color-gray-200);
-    background-color: white;
-}
-.dark .fi-simple-main {
-    border-color: var(--fi-color-gray-800);
-    background-color: var(--fi-color-gray-900);
-}
-
-.fi-simple-header-heading {
-    font-family: var(--font-display);
-    font-weight: 700;
-    letter-spacing: -0.025em;
-    font-size: 1.5rem;
-}
-
-/* ==========================================================================
-   19. RED CHECK BULLETS in lists / prose
-   ========================================================================== */
-
-.fi-prose ul,
-.fi-section-content ul:not([class*="fi-"]) {
-    list-style: none;
-    padding-left: 0;
-}
-.fi-prose ul li,
-.fi-section-content ul:not([class*="fi-"]) li {
-    position: relative;
-    padding-left: 1.625rem;
-    margin-block: 0.375rem;
-}
-.fi-prose ul li::before,
-.fi-section-content ul:not([class*="fi-"]) li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.4em;
-    width: 1rem;
-    height: 1rem;
-    background-color: var(--fi-color-primary-500);
-    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'><path fill-rule='evenodd' d='M16.704 5.29a1 1 0 010 1.42l-7.5 7.5a1 1 0 01-1.42 0l-3.5-3.5a1 1 0 111.42-1.42L8.5 12.08l6.79-6.79a1 1 0 011.414 0z' clip-rule='evenodd'/></svg>") center / contain no-repeat;
-            mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'><path fill-rule='evenodd' d='M16.704 5.29a1 1 0 010 1.42l-7.5 7.5a1 1 0 01-1.42 0l-3.5-3.5a1 1 0 111.42-1.42L8.5 12.08l6.79-6.79a1 1 0 011.414 0z' clip-rule='evenodd'/></svg>") center / contain no-repeat;
-}
-
-/* ==========================================================================
-   20. CODE — dark even in light mode
-   ========================================================================== */
-
-code:not([class*="fi-"]):not(pre code) {
-    background-color: var(--fi-color-gray-900);
-    color: var(--fi-color-primary-300);
-    border-radius: var(--fd-radius-xs);
-    padding: 0.125rem 0.375rem;
-    font-family: var(--font-mono);
-    font-size: 0.8125em;
-    border: 1px solid var(--fi-color-gray-800);
-}
-
-pre {
-    background-color: var(--fi-color-gray-950);
-    color: var(--fi-color-gray-100);
-    border-radius: var(--fd-radius);
-    padding: 1rem 1.25rem;
-    border: 1px solid var(--fi-color-gray-800);
-    font-family: var(--font-mono);
-    font-size: 0.875rem;
-    overflow-x: auto;
-}
-
-/* ==========================================================================
-   21. AVATAR
-   ========================================================================== */
-
-.fi-avatar {
-    border: 1px solid var(--fi-color-gray-200);
-    box-shadow: 0 0 0 2px white;
-}
-.dark .fi-avatar {
-    border-color: var(--fi-color-gray-700);
-    box-shadow: 0 0 0 2px var(--fi-color-gray-900);
-}
-
-/* ==========================================================================
-   22. UTILITIES
-   ==========================================================================
-   .fd-eyebrow       → uppercase tracking eyebrow text (primary honey)
-   .fd-display       → display heading style (Outfit, tight letter-spacing)
-*/
-
-.fd-eyebrow {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 0.6875rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--fi-color-primary-600);
-}
-
-.fd-display {
-    font-family: var(--font-display);
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
+
+    /* Danger: quiet outline by default, tinted on hover */
+    .fi-btn.fi-color-danger:not(.fi-outlined):not(label) {
+        @apply bg-transparent text-danger-600 shadow-none ring-1 ring-danger-500/40 dark:text-danger-400;
+
+        & > .fi-icon {
+            @apply text-danger-600 dark:text-danger-400;
+        }
+
+        &.fi-force-enabled,
+        &:not(.fi-disabled):not([disabled]) {
+            @variant hover {
+                @apply bg-danger-500/10 text-danger-700 ring-danger-500 dark:text-danger-300;
+            }
+        }
+    }
+
+    .fi-btn.fi-outlined {
+        @apply shadow-none ring-(--tribute-line);
+    }
+
+    /* Toggle buttons: the checked option reads honey instead of gray */
+    input:checked + label.fi-btn:not(.fi-outlined):not(.fi-color) {
+        background-color: color-mix(in oklch, var(--primary-500) 14%, white);
+        @apply text-primary-700 ring-1 ring-primary-500;
+
+        @variant dark {
+            background-color: color-mix(in oklch, var(--primary-500) 22%, var(--gray-900));
+            @apply text-primary-200;
+        }
+
+        &.fi-force-enabled,
+        &:not(.fi-disabled):not([disabled]) {
+            @variant hover {
+                background-color: color-mix(in oklch, var(--primary-500) 22%, white);
+
+                @variant dark {
+                    background-color: color-mix(in oklch, var(--primary-500) 30%, var(--gray-900));
+                }
+            }
+        }
+    }
+
+    /* ----- Forms --------------------------------------------------------- */
+
+    .fi-input-wrp {
+        @apply shadow-none ring-(--tribute-line);
+
+        &:not(.fi-disabled):not(.fi-invalid) {
+            @variant hover {
+                @apply ring-gray-400 dark:ring-gray-600;
+            }
+        }
+    }
+
+    /* ----- Tables -------------------------------------------------------- */
+
+    .fi-ta-ctn {
+        @apply tribute-card;
+
+        & .fi-ta-header,
+        & .fi-ta-header-toolbar,
+        & .fi-ta-filters-above-content-ctn,
+        & .fi-ta-filters.fi-ta-filters-below-content,
+        & .fi-ta-filter-indicators,
+        & .fi-ta-selection-indicator,
+        & .fi-pagination {
+            @apply border-(--tribute-line);
+        }
+
+        & .fi-ta-filter-indicators,
+        & .fi-ta-selection-indicator {
+            @apply bg-transparent;
+        }
+    }
+
+    .fi-ta-table {
+        @apply divide-(--tribute-line);
+
+        & > thead,
+        & > tbody {
+            @apply divide-(--tribute-line);
+        }
+
+        /* Flat header band like the site; keeps the top corner tick visible */
+        & > thead > tr {
+            @apply bg-transparent;
+        }
+    }
+
+    .fi-ta-header-cell {
+        @apply text-xs text-gray-600 dark:text-gray-400;
+    }
+
+    .fi-ta-row.fi-clickable {
+        @variant hover {
+            background-color: color-mix(in oklch, var(--primary-500) 12%, transparent);
+        }
+    }
+
+    .fi-ta-row.fi-striped,
+    .fi-ta-row.fi-selected:not(.fi-striped) {
+        background-color: color-mix(in oklch, var(--primary-500) 6%, transparent);
+    }
+
+    /* Pagination: individual tan squares like the site's listings */
+    .fi-pagination .fi-pagination-items {
+        @apply gap-1 rounded-none bg-transparent shadow-none ring-0;
+    }
+
+    .fi-pagination .fi-pagination-item {
+        @apply border-0;
+
+        & .fi-pagination-item-btn,
+        &:first-of-type .fi-pagination-item-btn,
+        &:last-of-type .fi-pagination-item-btn {
+            @apply rounded-xs ring-1 ring-(--tribute-line);
+        }
+
+        &.fi-active .fi-pagination-item-btn {
+            background-color: var(--tribute-line);
+        }
+
+        &.fi-active .fi-pagination-item-label {
+            @apply text-gray-800 dark:text-white;
+        }
+    }
+
+    /* ----- Badges & tabs ------------------------------------------------- */
+
+    .fi-badge {
+        @apply rounded-xs ring-0;
+    }
+
+    /* Page tabs: flat strip, honey underline on the active item */
+    .fi-tabs:not(.fi-contained) {
+        @apply rounded-none border-b border-(--tribute-line) bg-transparent p-0 shadow-none ring-0;
+
+        &.fi-vertical {
+            @apply border-e border-b-0;
+        }
+    }
+
+    .fi-tabs-item {
+        @apply rounded-none hover:bg-transparent focus-visible:bg-primary-500/10;
+
+        &.fi-active {
+            @apply bg-transparent shadow-[inset_0_-2px_0_0_var(--primary-500)];
+
+            & .fi-tabs-item-label,
+            & > .fi-icon {
+                @apply text-gray-950 dark:text-white;
+            }
+        }
+    }
+
+    .fi-tabs.fi-contained {
+        @apply border-(--tribute-line);
+    }
+
+    /* ----- Notifications ------------------------------------------------- */
+
+    .fi-no-notification:not(.fi-inline) {
+        @apply rounded-lg ring-(--tribute-line);
+    }
+
+    /* ----- Widgets ------------------------------------------------------- */
+
+    .fi-wi-stats-overview-stat {
+        @apply tribute-card;
+
+        & .fi-wi-stats-overview-stat-label {
+            @apply text-xs font-semibold text-gray-600 dark:text-gray-400;
+        }
+
+        & .fi-wi-stats-overview-stat-value {
+            @apply font-display text-[2rem] font-bold text-gray-800 tabular-nums dark:text-white;
+        }
+
+        & .fi-wi-stats-overview-stat-chart {
+            border-radius: 0 0 var(--tribute-radius) var(--tribute-radius);
+        }
+    }
+
+    .fi-wi-chart {
+        & .fi-wi-chart-text-color {
+            @apply text-gray-500 dark:text-gray-400;
+        }
+
+        & .fi-wi-chart-grid-color {
+            color: color-mix(in oklch, var(--gray-500) 14%, transparent);
+        }
+
+        & .fi-wi-chart-bg-color {
+            color: color-mix(in oklch, var(--primary-500) 14%, transparent);
+        }
+
+        & .fi-wi-chart-border-color {
+            @apply text-primary-500;
+        }
+    }
 }

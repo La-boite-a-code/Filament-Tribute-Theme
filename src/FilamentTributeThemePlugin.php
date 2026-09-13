@@ -2,17 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Laboiteacode\FilamentDesign;
+namespace Laboiteacode\FilamentTributeTheme;
 
 use Closure;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Filament\Support\Colors\Color;
-use Filament\View\PanelsRenderHook;
-use Illuminate\Support\HtmlString;
-use Laboiteacode\FilamentDesign\Enums\Palette;
+use Laboiteacode\FilamentTributeTheme\Enums\Palette;
 
-class FilamentDesignPlugin implements Plugin
+class FilamentTributeThemePlugin implements Plugin
 {
     /**
      * @var array<string, mixed>
@@ -23,57 +21,34 @@ class FilamentDesignPlugin implements Plugin
 
     protected ?string $font = 'Albert Sans';
 
+    /**
+     * Filament's default provider is Bunny Fonts; its generated URL carries
+     * no italic axis, so the brand face ships its own URL with italics.
+     */
+    protected ?string $fontUrl = 'https://fonts.bunny.net/css?family=albert-sans:400,400i,500,500i,600,600i,700,700i&display=swap';
+
     protected bool|string $maxContentWidth = false;
 
     protected ?Palette $palette = null;
 
     public function getId(): string
     {
-        return 'filament-design';
+        return 'filament-tribute-theme';
     }
 
     public function register(Panel $panel): void
     {
-        $palette = $this->resolvePalette();
-
         if ($this->registerColors) {
-            $panel->colors($this->resolveColors($palette));
+            $panel->colors($this->resolveColors($this->getPalette()));
         }
 
         if ($this->font !== null) {
-            $panel->font($this->font);
+            $panel->font($this->font, $this->fontUrl);
         }
 
         if ($this->maxContentWidth !== false) {
             $panel->maxContentWidth($this->maxContentWidth === true ? 'full' : $this->maxContentWidth);
         }
-
-        if ($palette !== Palette::Honey) {
-            $cssClass = $palette->cssClass();
-
-            $panel->renderHook(
-                PanelsRenderHook::BODY_START,
-                fn (): HtmlString => new HtmlString(
-                    "<script>document.body.classList.add('{$cssClass}');</script>"
-                ),
-            );
-        }
-    }
-
-    /**
-     * Resolve the active palette: an explicit `->palette()` call wins; if
-     * not provided, fall back to the published config value (driven by the
-     * `FILAMENT_DESIGN_PALETTE` env var); if still missing, default to Honey.
-     */
-    protected function resolvePalette(): Palette
-    {
-        if ($this->palette instanceof Palette) {
-            return $this->palette;
-        }
-
-        $configured = (string) config('filament-design.palette', Palette::Honey->value);
-
-        return Palette::tryFrom($configured) ?? Palette::Honey;
     }
 
     public function boot(Panel $panel): void
@@ -105,7 +80,23 @@ class FilamentDesignPlugin implements Plugin
     }
 
     /**
-     * Override the color palette applied to the panel.
+     * The active palette: an explicit `->palette()` call wins; otherwise the
+     * published config value (driven by `FILAMENT_TRIBUTE_THEME_PALETTE`); otherwise
+     * Honey.
+     */
+    public function getPalette(): Palette
+    {
+        if ($this->palette instanceof Palette) {
+            return $this->palette;
+        }
+
+        $configured = (string) config('filament-tribute-theme.palette', Palette::Honey->value);
+
+        return Palette::tryFrom($configured) ?? Palette::Honey;
+    }
+
+    /**
+     * Override the colour array registered on the panel.
      *
      * @param  array<string, mixed>  $colors
      */
@@ -117,8 +108,8 @@ class FilamentDesignPlugin implements Plugin
     }
 
     /**
-     * Disable FilamentDesign's default color palette injection (let the
-     * panel keep its own ->colors([...]) configuration untouched).
+     * Skip colour registration entirely and keep the panel's own
+     * `->colors([...])` configuration untouched.
      */
     public function withoutColors(): static
     {
@@ -127,9 +118,14 @@ class FilamentDesignPlugin implements Plugin
         return $this;
     }
 
-    public function font(?string $font): static
+    /**
+     * Body font registered through Filament's `->font()`. Pass `null` to keep
+     * the panel's own font; pass a `$url` to load the family from elsewhere.
+     */
+    public function font(?string $font, ?string $url = null): static
     {
         $this->font = $font;
+        $this->fontUrl = $url;
 
         return $this;
     }
@@ -147,7 +143,8 @@ class FilamentDesignPlugin implements Plugin
     }
 
     /**
-     * Default Filament-inspired palette resolved from the active brand.
+     * The brand palette as the primary colour, warm Stone grays (the
+     * filamentphp.com text colours) and Filament's stock semantic colours.
      *
      * @return array<string, mixed>
      */
@@ -158,7 +155,7 @@ class FilamentDesignPlugin implements Plugin
         }
 
         return [
-            'primary' => Color::hex($palette->hex()),
+            'primary' => $palette->shades(),
             'gray' => Color::Stone,
             'info' => Color::Sky,
             'success' => Color::Emerald,

@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-use Laboiteacode\FilamentDesign\Enums\Palette;
+use Laboiteacode\FilamentTributeTheme\Enums\Palette;
 
 /*
- * FilamentDesign theme configuration.
+ * Filament Tribute Theme configuration.
  *
  * The whole theme is configured fluently from your Filament PanelProvider:
  *
  *     ->plugin(
- *         FilamentDesignPlugin::make()
+ *         FilamentTributeThemePlugin::make()
  *             ->palette(Palette::Powder)
  *             ->maxContentWidth('full'),
  *     )
  *
  * This config file only exists for projects that prefer environment-driven
  * defaults. Publish it with:
- *   php artisan vendor:publish --tag="filament-design-config"
+ *   php artisan vendor:publish --tag="filament-tribute-theme-config"
  */
 return [
 
@@ -34,6 +34,6 @@ return [
     |
     */
 
-    'palette' => env('FILAMENT_DESIGN_PALETTE', Palette::Honey->value),
+    'palette' => env('FILAMENT_TRIBUTE_THEME_PALETTE', Palette::Honey->value),
 
 ];
