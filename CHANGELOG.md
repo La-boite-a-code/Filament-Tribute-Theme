@@ -2,7 +2,7 @@
 
 All notable changes to `filament-tribute-theme` will be documented in this file.
 
-## 1.0.0 - 2026-09-13
+## 1.0.0 - 2026-09-19
 
 First release.
 

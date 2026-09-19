@@ -12,7 +12,7 @@
 [![Tests](https://img.shields.io/github/actions/workflow/status/la-boite-a-code/filament-tribute-theme/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/la-boite-a-code/filament-tribute-theme/actions/workflows/run-tests.yml)
 [![Static Analysis](https://img.shields.io/github/actions/workflow/status/la-boite-a-code/filament-tribute-theme/phpstan.yml?branch=main&label=phpstan&style=flat-square)](https://github.com/la-boite-a-code/filament-tribute-theme/actions/workflows/phpstan.yml)
 [![Total Downloads](https://img.shields.io/packagist/dt/laboiteacode/filament-tribute-theme.svg?style=flat-square)](https://packagist.org/packages/laboiteacode/filament-tribute-theme)
-[![License](https://img.shields.io/packagist/l/laboiteacode/filament-tribute-theme.svg?style=flat-square)](LICENSE.md)
+[![License](https://img.shields.io/packagist/l/laboiteacode/filament-tribute-theme.svg?style=flat-square)](https://github.com/La-boite-a-code/Filament-Tribute-Theme/blob/main/LICENSE.md)
 
 </div>
 
@@ -108,7 +108,7 @@ public function panel(Panel $panel): Panel
 ```
 
 Make sure the entry-point is listed in your `vite.config.js` inputs, as for
-any [Filament custom theme](https://filamentphp.com/docs/panels/themes).
+any [Filament custom theme](https://filamentphp.com/docs/5.x/styling/overview#creating-a-custom-theme).
 
 ### 4. Build the assets
 
@@ -299,4 +299,4 @@ npm run build      # compiles the theme against Filament's stylesheet
 
 ## License
 
-MIT — see [LICENSE.md](./LICENSE.md).
+MIT — see [LICENSE.md](https://github.com/La-boite-a-code/Filament-Tribute-Theme/blob/main/LICENSE.md).
