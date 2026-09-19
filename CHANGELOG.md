@@ -2,6 +2,11 @@
 
 All notable changes to `filament-tribute-theme` will be documented in this file.
 
+## Unreleased
+
+- `FilamentTributeTheme::version()` reads the installed version from
+  Composer's runtime API instead of returning a hard-coded `1.0.0`.
+
 ## 1.0.0 - 2026-09-19
 
 First release.
