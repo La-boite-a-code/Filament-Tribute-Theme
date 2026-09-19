@@ -2,11 +2,16 @@
 
 declare(strict_types=1);
 
+use Composer\InstalledVersions;
 use Laboiteacode\FilamentTributeTheme\FilamentTributeTheme;
 use Laboiteacode\FilamentTributeTheme\FilamentTributeThemePlugin;
 
-it('has a version', function (): void {
-    expect((new FilamentTributeTheme)->version())->toBe('1.0.0');
+it('reports the version Composer installed', function (): void {
+    $installed = InstalledVersions::getPrettyVersion('laboiteacode/filament-tribute-theme');
+
+    expect((new FilamentTributeTheme)->version())
+        ->not->toBeEmpty()
+        ->toBe(ltrim((string) $installed, 'v'));
 });
 
 it('exposes a plugin id', function (): void {
